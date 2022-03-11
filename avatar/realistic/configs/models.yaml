@@ -3,57 +3,59 @@ generator:
     stride: 3
     kernel_size: 5
     layer_1: 
-      'in_channels': 3
-      'out_channels': 1024
+      in_channels: 3
+      out_channels: 1024
     layer_2:  
-      'in_channels': 1024
-      'out_channels': 512
+      in_channels: 1024
+      out_channels: 512
     layer_3:  
-      'in_channels': 512
-      'out_channels': 512
+      in_channels: 512
+      out_channels: 512
     layer_4:  
-      'in_channels': 512
-      'out_channels': 256
+      in_channels: 512
+      out_channels: 256
     layer_5:  
-      'in_channels': 256
-      'out_channels': 256
+      in_channels: 256
+      out_channels: 256
     layer_6:  
-      'in_channels': 256
-      'out_channels': 128
-    
+      in_channels: 256
+      out_channels: 256
+
   audio_encoder:
-    layer_1: 
-      'in_channels': 80
-      'out_channels': 1024
-      'kernel_size': 15
-    
-    layer_2:  
-      'in_channels': 1024
-      'out_channels': 512
-      'kernel_size': 12
-    
-    layer_3:  
-      'in_channels': 512
-      'out_channels': 512
-      'kernel_size': 8
-    
-    layer_4:  
-      'in_channels': 512
-      'out_channels': 256
-      'kernel_size': 5
-    
-    layer_5:  
-      'in_channels': 256
-      'out_channels': 256
-      'kernel_size': 3
-    
-    gru: 
-      'input_size': 256
-      'hidden_size': 128
-      'num_layers': 1
-    
+    hid_d: 4 # Exponential increases every layer, current settings = 2^8 * hid_d
+    out_d: 256
+    sample_rate: 16000
+    audio_length: 0.2 # Seconds
+    n_layers: 4
+    feature_size_limit: 1024
+    gru:
+      input_size: 256
+      hidden_size: 256
+      num_layers: 1
+
   noise_generator: 
-    'input_size': 10
-    'hidden_size': 128
-    'num_layers': 1
+    input_size: 10
+    hidden_size: 256
+    num_layers: 1
   
+  frame_decoder:
+    stride: 3
+    kernel_size: 5
+    layer_1: 
+      in_channels: 256
+      out_channels: 1024
+    layer_2:  
+      in_channels: 1024
+      out_channels: 512
+    layer_3:  
+      in_channels: 512
+      out_channels: 512
+    layer_4:  
+      in_channels: 512
+      out_channels: 256
+    layer_5:  
+      in_channels: 256
+      out_channels: 256
+    layer_6:  
+      in_channels: 256
+      out_channels: 3
