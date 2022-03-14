@@ -1,0 +1,10 @@
+name: crema
+# Video
+fps: 25
+img_frames_per_audio_clip: 5
+audio_frame_size: 0.2 # 5 video frames with fps of 25
+audio_frame_feature_len: 3200
+audio_frame_overlap: 0.1
+img_size: [192, 256]
+max_n_video_frames: 30 # Samples more than this are skipped
+real_frame_sample_size: 10 # Number of sample frames to get

@@ -1,69 +1,56 @@
 import math
 import torch
 import torch.nn as nn
-from utils import calculate_output_length, calculate_padding, prime_factors
+from utils import calculate_output_length, calculate_padding, is_power2, prime_factors
 
 
 class ImageEncoder(nn.Module):
-    def __init__(self, config):
+    def __init__(self, config, img_size):
         super().__init__() 
-        
+        # Get the dimension which is a power of 2
+        if is_power2(max(img_size)):
+            stable_dim = max(img_size)
+        else:
+            stable_dim = min(img_size)
+            
+        final_size = tuple(int(4 * x // stable_dim)+4 for x in img_size)
         padding = calculate_padding(config['kernel_size'], 
                                     config['stride'])
-        self.layer_1 = self._make_layer(config['layer_1']['in_d'],
-                                        config['layer_1']['out_d'],
-                                        config['stride'],
-                                        config['kernel_size'],
-                                        padding)
-        self.layer_2 = self._make_layer(config['layer_1']['in_d'],
-                                        config['layer_1']['out_d'],
-                                        config['stride'],
-                                        config['kernel_size'],
-                                        padding)
-        self.layer_3 = self._make_layer(config['layer_1']['in_d'],
-                                        config['layer_1']['out_d'],
-                                        config['stride'],
-                                        config['kernel_size'],
-                                        padding)
-        self.layer_4 = self._make_layer(config['layer_1']['in_d'],
-                                        config['layer_1']['out_d'],
-                                        config['stride'],
-                                        config['kernel_size'],
-                                        padding)
-        self.layer_5 = self._make_layer(config['layer_1']['in_d'],
-                                        config['layer_1']['out_d'],
-                                        config['stride'],
-                                        config['kernel_size'],
-                                        padding)
-        self.layer_6 = self._make_layer(config['layer_1']['in_d'],
-                                        config['layer_1']['out_d'],
-                                        config['stride'],
-                                        config['kernel_size'],
-                                        padding)
+        num_layers = int(math.log2(max(img_size)))-2
         
-    def _make_layer(in_d, out_d, stride, kernel_size, pad):
+        self.layers = nn.ModuleList()
+        hid_d = config['hid_d']
+        for i in range(num_layers-1):
+            self.layers.append(
+                self._make_layer(3 if i == 0 else hid_d,
+                                 hid_d * 2,
+                                 config['kernel_size'],
+                                 config['stride'],
+                                 padding//2))
+            hid_d = hid_d * 2
+        self.layers.append(
+                nn.Sequential(
+                    nn.Conv2d(hid_d, config['out_d'], final_size),
+                    nn.Tanh()))
+            
+    def _make_layer(self, in_d, out_d, kernel_size, stride=1, pad=0):
             return nn.Sequential(
-                nn.Conv2d(in_d, out_d,
-                        stride=stride,
-                        padding=pad,
-                        kernel_size=kernel_size),
+                nn.Conv2d(in_d, out_d, kernel_size, stride, pad),
                 nn.BatchNorm2d(out_d),
                 nn.ReLU())
             
-    def forward(self, img):
-        out_1 = self.layer_1(img)
-        out_2 = self.layer_2(out_1)
-        out_3 = self.layer_3(out_2)
-        out_4 = self.layer_4(out_3)
-        out_5 = self.layer_5(out_4)
-        out_6 = self.layer_6(out_5)
-        return [out_1, out_2, out_3, out_4, out_5, out_6]
+    def forward(self, x):
+        img_latent = []
+        for layer in self.layers:
+            x = layer(x)
+            img_latent.append(x)
+        img_latent[-1] = img_latent[-1].squeeze(-1).squeeze(-1)
+        return img_latent
     
-    
+
 class AudioEncoder(nn.Module):
     def __init__(self, config):
         super().__init__() 
-
         hid_d=config['hid_d']
         out_d=config['out_d']
         features = config['audio_length'] * config['sample_rate']
@@ -99,11 +86,9 @@ class AudioEncoder(nn.Module):
                     nn.BatchNorm1d(out_d),
                     nn.Tanh(),    
                 ))
-        
         self.layers = nn.Sequential(
             *self.layers
         )
-
         self.encoder = nn.GRU(**config['gru'], batch_first=True)
         
     def forward(self, audio):
@@ -114,13 +99,13 @@ class AudioEncoder(nn.Module):
         '''
         z = self.layers(audio)
         z, h_0 = self.encoder(z.transpose(1,2))
-        return z.transpose(1,2)
+        return z.transpose(1,2).squeeze(-1)
 
 
 class Encoder(nn.Module):
-    def __init__(self, config):
+    def __init__(self, config, img_size):
         super().__init__() 
-        self.image_encoder = ImageEncoder(config['image_encoder'])
+        self.image_encoder = ImageEncoder(config['image_encoder'], img_size)
         self.audio_encoder = AudioEncoder(config['audio_encoder'])
         self.noise_encoder = nn.GRU(**config['noise_generator'])
         
@@ -132,43 +117,104 @@ class Encoder(nn.Module):
         noise_z, h_0 = self.noise_encoder(noise)
         audio_z = self.audio_encoder(audio)
         img_zs = self.image_encoder(img)
-        out = torch.cat((img_zs[-1].squeeze(-1), audio_z, noise_z.transpose(1,2)), dim=-1)
-        return out
+        out = torch.cat((img_zs[-1],
+                         audio_z,
+                         noise_z.transpose(1,2).squeeze(-1)),
+                         dim=-1)
+        return out, img_zs
 
 
 class FrameDecoder(nn.Module):
-    def __init__(self, config):
+    def __init__(self, config, img_size):
         super().__init__() 
         
         padding = calculate_padding(config['kernel_size'], 
                                     config['stride'])
-        self.layers = nn.ModuleList()
         
-    def _make_layer(in_d, out_d, stride, kernel_size, pad):
+        num_layers = int(math.log2(max(img_size)))-2
+        hid_ds = self.get_hid_ds(num_layers, config['hid_d'])
+        
+        self.layers = nn.ModuleList()
+        self.prelayers = nn.ModuleList()
+        
+        self.start_layer = self._make_layer(config['in_d'], 
+                                            hid_ds[0], 
+                                            config['kernel_size'])
+        
+        for i in range(num_layers-1):            
+            self.prelayers.append(
+                self._make_layer(
+                    # Stacking enc with dec (Unet)
+                    hid_ds[i] + hid_ds[i],
+                    hid_ds[i],
+                    kernel_size=3,pad=1))
+            
+            self.layers.append(
+                self._make_layer(hid_ds[i],
+                                 hid_ds[i+1],
+                                 stride=config['stride'],
+                                 kernel_size=config['kernel_size'],
+                                 pad=padding//2))
+            
+        self.end_layer = nn.Sequential(
+            nn.ConvTranspose2d(hid_ds[-1], 3, 1),
+            nn.Tanh(),
+        )
+            
+    def get_hid_ds(self, num_layers, start_dim):
+        hid_ds = []
+        for i in range(num_layers):
+            hid_ds.append(start_dim)
+            start_dim *= 2
+        hid_ds.reverse()
+        return hid_ds
+            
+    def _make_layer(self, in_d, out_d, kernel_size, stride=1, pad=0):
             return nn.Sequential(
-                nn.Conv2d(in_d, out_d,
-                        stride=stride,
-                        padding=pad,
-                        kernel_size=kernel_size),
+                nn.ConvTranspose2d(in_d,out_d,
+                                   kernel_size, 
+                                   stride, pad),
                 nn.BatchNorm2d(out_d),
                 nn.ReLU())
             
-    def forward(self, latent, img_hids):
-        for i in range(self.layers):
-            latent = self.layers[i](latent) + img_hids[i]
-        return latent  
+    def forward(self, x, img_latents):
+        img_latents.pop() # Last img latent already included in x
+        img_latents.reverse() 
+        x = self.start_layer(x.view(*x.size(), 1, 1))
+        for i, layer in enumerate(self.layers):
+            x = torch.cat((x, img_latents[i]), dim=1)
+            x = self.prelayers[i](x)
+            x = layer(x) 
+        x = self.end_layer(x)
+        return x
     
+    
+class Generator(nn.Module):
+    def __init__(self, config, img_size):
+        super().__init__() 
+        self.encoder = Encoder(config['encoder'], img_size)
+        self.decoder = FrameDecoder(config['frame_decoder'], img_size)
+        
+    def forward(self, img, audio_frames):
+        '''
+        Input Frame: Same image BS times [BS, C, H, W]
+        Audio Frames: [BS (# of frames), 0.2s + pad Len, 1]
+        '''
+        latent, img_latents = self.encoder(img, audio_frames)
+        generated_frames = self.decoder(latent, img_latents)
+        return generated_frames
+
     
 import yaml
 
 with open('/home/j/Desktop/Programming/AI/DeepLearning/la_solitudine/avatar/realistic/configs/models.yaml', 'r') as f:
     config=  yaml.load(f.read(), Loader=yaml.FullLoader)
     
-gen = Generator(config['generator'])
+gen = Generator(config['generator'], config['img_size'])
 
-img = torch.randn((3, 3, 96,128))
+
+
+img = torch.randn((3, 3, 256, 256))
 audio_frames = torch.randn((3, 1, 3200))
-
-img_zs = gen(img, audio_frames)
-
-print(img_zs.size())
+frames = gen(img, audio_frames)
+print(frames.size())
