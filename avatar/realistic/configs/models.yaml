@@ -5,7 +5,7 @@ generator:
     image_encoder:
       stride: 2
       kernel_size: 4
-      hid_d: 64
+      hid_d: 32
       out_d: 256
 
     audio_encoder:
@@ -27,31 +27,37 @@ generator:
   
   frame_decoder:
     stride: 2
-    kernel_size: 8
+    kernel_size: [6,8]
     in_d: 768 # concatenated dimensions of audio, img & noise
     # Should be same as image_encoder hid_d
-    hid_d: 64
+    hid_d: 32
 
-discriminators:
 
-  frame_discriminator:
-    feature_sizes: [64, 128, 256, 512, 256, 128]
-    kernel_size: [4, 4, 4, 4, 9, 12]
-    stride: 2
+frame_discriminator:
+  feature_sizes: [64, 128, 256, 512, 256, 128]
+  kernel_size: [4, 4, 4, 4, 9, 12]
+  stride: 2
 
-  video_discriminator:
-    max_n_video_frames: 50 #[1, C, N(22), H, W]
-    feature_sizes: [128, 256, 512, 512]
-    kernel_sizes: [4, 4, 10, 10]
-    stride: 2
+video_discriminator:
+  max_n_frames: 50 #[1, C, N(22), H, W]
+  feature_sizes: [128, 256, 512, 512]
+  kernel_sizes: [4, 4, 10, 10]
+  stride: 2
 
-  sync_discriminator:
-    audio_length: 110000 # Sample_rate * seconds (0.2)
-    frames_per_clip: 5
-    video_feature_sizes: [32, 64, 128, 256]
-    video_kernel_sizes: [4, 4, 4, 10]
-    video_stride: 2
+sync_discriminator:
+  audio_length: 3200 # Sample_rate (16000) * seconds (0.2)
+  frames_per_clip: 5
+  video_feature_sizes: [32, 64, 128, 256]
+  video_kernel_sizes: [4, 4, 4, 10]
+  video_stride: 2
 
-    audio_feature_sizes: [16, 32, 64, 128, 256]
-    audio_kernel_sizes: [250, 4, 4, 4, 10]
-    audio_stride: [50, 2, 2, 2, 5]
+  audio_feature_sizes: [16, 32, 64, 128, 256]
+  audio_kernel_sizes: [250, 4, 4, 4, 10]
+  audio_stride: [50, 2, 2, 2, 5]
+
+
+# Loss discounts
+sync_loss_gamma: 0.8
+video_loss_gamma: 0.2
+frame_loss_gamma: 1.0
+reconstruction_loss_gamma: 600

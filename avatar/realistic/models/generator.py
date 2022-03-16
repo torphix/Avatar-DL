@@ -1,7 +1,7 @@
 import math
 import torch
 import torch.nn as nn
-from utils import calculate_output_length, calculate_padding, is_power2, prime_factors
+from .utils import calculate_output_length, calculate_padding, is_power2, prime_factors
 
 
 class ImageEncoder(nn.Module):
@@ -12,8 +12,9 @@ class ImageEncoder(nn.Module):
             stable_dim = max(img_size)
         else:
             stable_dim = min(img_size)
-            
-        final_size = tuple(int(4 * x // stable_dim)+4 for x in img_size)
+        # TODO: Hard coded should be variable
+        final_size_h = int(4 * img_size[0] // stable_dim)+3
+        final_size_w = int(4 * img_size[1] // stable_dim)+4
         padding = calculate_padding(config['kernel_size'], 
                                     config['stride'])
         num_layers = int(math.log2(max(img_size)))-2
@@ -30,7 +31,8 @@ class ImageEncoder(nn.Module):
             hid_d = hid_d * 2
         self.layers.append(
                 nn.Sequential(
-                    nn.Conv2d(hid_d, config['out_d'], final_size),
+                    nn.Conv2d(hid_d, config['out_d'], 
+                              (final_size_h, final_size_w)),
                     nn.Tanh()))
             
     def _make_layer(self, in_d, out_d, kernel_size, stride=1, pad=0):
@@ -109,11 +111,21 @@ class Encoder(nn.Module):
         self.audio_encoder = AudioEncoder(config['audio_encoder'])
         self.noise_encoder = nn.GRU(**config['noise_generator'])
         
+        self.param = nn.Parameter(torch.empty(0))
+        
+    @property    
+    def device(self):
+        return self.param.device
+        
     def forward(self, img, audio):
-        BS, L, N = audio.size()
+        audio = audio
+        BS, L , N = audio.size()
         noise = torch.normal(mean=0., 
                              std=torch.tensor(0.6),
-                             size=(BS, 1, 10))
+                             size=(BS, 1, 10),
+                             device=self.device)
+        img = img.expand(audio.size(0), 
+                         *img.shape[1:])
         noise_z, h_0 = self.noise_encoder(noise)
         audio_z = self.audio_encoder(audio)
         img_zs = self.image_encoder(img)
@@ -128,8 +140,10 @@ class FrameDecoder(nn.Module):
     def __init__(self, config, img_size):
         super().__init__() 
         
-        padding = calculate_padding(config['kernel_size'], 
-                                    config['stride'])
+        padding_h = calculate_padding(config['kernel_size'][0], 
+                                      config['stride'])
+        padding_w = calculate_padding(config['kernel_size'][1], 
+                                      config['stride'])
         
         num_layers = int(math.log2(max(img_size)))-2
         hid_ds = self.get_hid_ds(num_layers, config['hid_d'])
@@ -154,7 +168,7 @@ class FrameDecoder(nn.Module):
                                  hid_ds[i+1],
                                  stride=config['stride'],
                                  kernel_size=config['kernel_size'],
-                                 pad=padding//2))
+                                 pad=(padding_h//2, padding_w//2)))
             
         self.end_layer = nn.Sequential(
             nn.ConvTranspose2d(hid_ds[-1], 3, 1),
@@ -205,16 +219,3 @@ class Generator(nn.Module):
         return generated_frames
 
     
-import yaml
-
-with open('/home/j/Desktop/Programming/AI/DeepLearning/la_solitudine/avatar/realistic/configs/models.yaml', 'r') as f:
-    config=  yaml.load(f.read(), Loader=yaml.FullLoader)
-    
-gen = Generator(config['generator'], config['img_size'])
-
-
-
-img = torch.randn((3, 3, 256, 256))
-audio_frames = torch.randn((3, 1, 3200))
-frames = gen(img, audio_frames)
-print(frames.size())

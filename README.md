@@ -10,5 +10,7 @@ Updates coming soon
         - Have img encoder work with any size image
         - Input text instead of audio to speed up inferrence
         - Make video discriminator linear layer variable input
+        - Adjust dims for batch processing
+        - Add an emotion embedding for each video
     - Ideas if not working:
         - Video discriminator is not working well: try CNN GRU
