@@ -1,5 +1,5 @@
 # [(W-K + 2P) / S] + 1
-img_size: [192, 256]
+img_size: [96, 128]
 generator:
   encoder:
     image_encoder:
@@ -34,13 +34,13 @@ generator:
 
 
 frame_discriminator:
-  feature_sizes: [64, 128, 256, 512, 256, 128]
+  feature_sizes: [32, 64, 128, 256, 512, 128]
   kernel_size: [4, 4, 4, 4, 9, 12]
   stride: 2
 
 video_discriminator:
-  max_n_frames: 50 #[1, C, N(22), H, W]
-  feature_sizes: [128, 256, 512, 512]
+  max_n_frames: 100 #[1, C, N(22), H, W]
+  feature_sizes: [32, 64, 128, 256]
   kernel_sizes: [4, 4, 10, 10]
   stride: 2
 

@@ -12,5 +12,5 @@ if __name__ == '__main__':
         args, leftover_args = parser.parse_known_args()
         data.get_dataset(args.dataset)
         
-    if command == 'train_realistic_avatar':
+    elif command == 'train_realistic_avatar':
         train()

@@ -29,8 +29,9 @@ class FrameDiscriminator(nn.Module):
                     nn.LeakyReLU(0.2, True)))
         self.layers.append(
             nn.Sequential(
-                nn.Conv2d(config['feature_sizes'][-1], 1, (10, 12)),
+                nn.Conv2d(config['feature_sizes'][-1], 1, (7,8)),
                 nn.Sigmoid()))
+        # (10, 12)
 
     def forward(self, x, starting_frame):
         '''
@@ -38,7 +39,6 @@ class FrameDiscriminator(nn.Module):
         starting_frame: [1, C, H, W] identity frame
         '''
         starting_frame = starting_frame.expand(x.size(0), -1,-1,-1)
-        print(x.size(), starting_frame.size())
         x = torch.cat((x, starting_frame), dim=1)
         for layer in self.layers:
             x = layer(x)
@@ -68,7 +68,7 @@ class VideoDiscriminator(nn.Module):
                                 nn.LeakyReLU(0.2, True)))
         
         self.linear = nn.Sequential(
-                            nn.Linear(512*26*26, 1),
+                            nn.Linear(15360, 1),
                             nn.Sigmoid())
 
     def forward(self, x):
@@ -76,7 +76,7 @@ class VideoDiscriminator(nn.Module):
         x: frames (synthetic or real): 
         [BS (2 real/fake), C, N Frames, H, W]
         '''
-        _, C, N, H, W = x.size()
+        _, N, C, H, W = x.size()
         x = x.permute(0, 2, 1, 3, 4).contiguous()
         x = F.pad(x, pad=(0, 0, 0, 0, int(self.max_n_frames-N), 0, 0, 0), value=0)
         x = self.prelayer(x)
@@ -120,7 +120,7 @@ class SyncDiscriminator(nn.Module):
             width = int((width-config['video_kernel_sizes'][i] + 2*0) / config['video_stride']) + 1
         linear_input = int(height*width*config['video_feature_sizes'][-1])
         # TODO: Fix hardcoded input values
-        self.video_linear = nn.Linear(35840, 256)
+        self.video_linear = nn.Linear(6144, 256)
         
         # Audio encoder
         width = config['audio_length'] 
@@ -187,7 +187,7 @@ class SyncDiscriminator(nn.Module):
         # Compute score
         sim_score = (frame_emb - audio_emb)**2
         x = self.discriminator(sim_score)
-        return sim_score, x
+        return x
     
     
     # Sync discriminator,

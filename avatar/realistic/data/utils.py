@@ -25,7 +25,7 @@ def get_dataset(dataset_name):
 
 # Audio
 def cut_audio_sequence(seq, cutting_stride, pad_samples, audio_frame_feature_len):
-    '''Splits audio into 1:1 frame audio clip mapping'''
+    '''Splits audio into 1:1 frame audio clip mapping (generator input)'''
     pad_left = torch.zeros(pad_samples // 2, 1)
     pad_right = torch.zeros(pad_samples - pad_samples // 2, 1)
 
@@ -35,14 +35,14 @@ def cut_audio_sequence(seq, cutting_stride, pad_samples, audio_frame_feature_len
     stacked = seq.narrow(0, 0, audio_frame_feature_len).unsqueeze(0)
     iterations = (seq.size()[0] - audio_frame_feature_len) // cutting_stride + 1
     for i in range(1, iterations):
-        stacked = torch.cat((stacked, 
-                                seq.narrow(0, i * cutting_stride, audio_frame_feature_len).unsqueeze(0)))
+        stacked = torch.cat((stacked, seq.narrow(0, i * cutting_stride, audio_frame_feature_len).unsqueeze(0)))
     return stacked
 
 def split_audio(audio, sample_rate, split_size):
     '''
     split_size in seconds: 
     divides audio into chunks {split_size} seconds long
+    (discriminator input) 
     '''
     audio = audio.squeeze(1)
     chunk_length = sample_rate * split_size
@@ -71,15 +71,11 @@ def shuffle_audio(audio_blocks):
     return audio_blocks
 
 # Video
+import skvideo.io
+
 def read_video(vid_path):
-    vidcap = cv2.VideoCapture(vid_path)
-    success, image = vidcap.read()
-    images = [torch.tensor(image)]
-    while success:
-        success, image = vidcap.read()
-        if image is not None:
-            images.append(torch.tensor(image))
-    return torch.stack(images).permute(0, 3, 1, 2).type(torch.FloatTensor)
+    vid_data = skvideo.io.vread(vid_path)
+    return torch.tensor(vid_data).permute(0, 3, 1, 2)
 
 def cut_video_sequence(video, frames_per_block):
     # Split video into list of blocks of 5 frames
