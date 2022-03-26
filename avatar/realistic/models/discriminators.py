@@ -178,6 +178,7 @@ class SyncDiscriminator(nn.Module):
         frame_emb = self.video_linear(frames)
         # Audio
         audio = audio.squeeze(0).float()
+        
         for i, layer in enumerate(self.audio_encoder_layers):
             audio = layer(audio)
         audio = audio.view(audio.size(0), -1)

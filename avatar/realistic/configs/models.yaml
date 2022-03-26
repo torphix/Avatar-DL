@@ -5,7 +5,7 @@ generator:
     image_encoder:
       stride: 2
       kernel_size: 4
-      hid_d: 32
+      hid_d: 64  # Starting dim, increases exponentially
       out_d: 256
 
     audio_encoder:
@@ -21,7 +21,7 @@ generator:
         num_layers: 1
 
     noise_generator: 
-      input_size: 10
+      input_size: 256
       hidden_size: 256
       num_layers: 1
   
@@ -30,7 +30,7 @@ generator:
     kernel_size: [6,8]
     in_d: 768 # concatenated dimensions of audio, img & noise
     # Should be same as image_encoder hid_d
-    hid_d: 32
+    hid_d: 64
 
 
 frame_discriminator:

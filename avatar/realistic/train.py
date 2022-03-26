@@ -139,8 +139,8 @@ class TrainModule(ptl.LightningModule):
     
     def reconstruction_loss(self, real_frames, fake_frames):
         '''Only calculate loss for bottom half'''
-        real_frames = real_frames[:, :, real_frames.size(-2)//2:, :]
-        fake_frames = fake_frames[:, :, fake_frames.size(-2)//2:, :]
+        real_frames = real_frames[:real_frames.size(0), :, :, :]
+        fake_frames = fake_frames[:real_frames.size(0), :, :, :]
         save_image(fake_frames, 'fake.png')
         loss = F.l1_loss(fake_frames, real_frames)
         return loss
@@ -161,7 +161,7 @@ class TrainModule(ptl.LightningModule):
         # Unpack batch
         identity_frame, audio_frames = batch['identity_frame'], batch['audio_generator_input']
         # Train generator
-        if optimizer_idx == 0:        
+        if optimizer_idx == 0:    
             generated_images = self.forward(identity_frame, audio_frames)
             # Losses 
             recon_loss = self.reconstruction_loss(
@@ -169,13 +169,9 @@ class TrainModule(ptl.LightningModule):
                 generated_images)
             g_loss = self.g_loss(self.d_fake_inference(batch, generated_images))
             g_loss = (recon_loss + g_loss) / 2
-            
-            tqdm_dict = {'g_loss':g_loss, 
-                         'recon_loss':recon_loss}
+            print('Generator Loss:', g_loss, 'Recon Loss:', recon_loss)
             output = OrderedDict({
                 'loss': recon_loss + g_loss,
-                'progress_bar': tqdm_dict,
-                'log': tqdm_dict,
             })
             # Save images
             save_image((generated_images + 0.5)*0.5, 'fake_images.png')
@@ -188,7 +184,8 @@ class TrainModule(ptl.LightningModule):
             real_outputs = self.d_real_inference(batch)
             outputs = fake_outputs | real_outputs
             d_loss = self.d_loss(outputs)
-            tqdm_dict = {'d_loss', d_loss}
+            tqdm_dict = {'d_loss', d_loss.detach()}
+            print(f'Discriminator Loss: {d_loss}')
             output = OrderedDict({
                 'loss':d_loss,
                 'progress_bar':tqdm_dict,

@@ -5,6 +5,7 @@ def inference(generator, identity_frame, audio_path, output_path):
     fps = 30
     writer = skvideo.io.FFmpegWriter(output_path,
                                      input_dict={'-r': str(fps)})
+    # audio = 
     generator(identity_frame, )
     
     

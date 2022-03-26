@@ -14,3 +14,13 @@ Updates coming soon
         - Add an emotion embedding for each video
     - Ideas if not working:
         - Video discriminator is not working well: try CNN GRU
+
+
+
+<!-- Next -->
+1. Lex:
+    - Center crop and align face what is average face alignment?
+    - Reconstruction should happend exclusivly around the mouth / facial area
+    
+    - Videos Done:
+        - Ian Goodfellow

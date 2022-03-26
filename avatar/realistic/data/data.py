@@ -7,29 +7,31 @@ import skvideo.io
 from scipy import signal
 from torch.utils.data import Dataset
 from torchvision import transforms
-import torchvision
 import numpy as np
 from tqdm import tqdm
+from torchvision.utils import save_image
+from . import face_alignment_mean_points
 from .utils import (cut_audio_sequence, 
                     read_video,
+                    resample_audio,
                     split_audio,
                     cut_video_sequence,
                     sample_frames)
 
-from torchvision.utils import save_image
 
 class GANDataset(Dataset):
     def __init__(self, config):
         super().__init__()
         root = 'avatar/realistic/data/datasets'
-        if config['name'] == 'crema': 
-            self.audio_path = os.path.abspath(f'{root}/processed/AudioWAV')
-            self.video_path = os.path.abspath(f'{root}/processed/VideoFlash')
+        assert config["name"] in ['lex', 'crema'], \
+            "Dataset names 'lex' or 'crema' currently supported"
+        self.audio_path = os.path.abspath(f'{root}/processed/{config["name"]}/AudioWAV')
+        self.video_path = os.path.abspath(f'{root}/processed/{config["name"]}/VideoFlash')
         
         # Video settings
         self.fps = config['fps']
         self.img_size = config['img_size']
-        self.img_frames_per_audio_clip = config['img_frames_per_audio_clip'] # 5
+        self.img_frames_per_audio_clip = config['img_frames_per_audio_clip'] # 5 (0.2s)
         self.img_transform = transforms.Compose([
             transforms.Resize((self.img_size[0], self.img_size[1])),
             transforms.Normalize((0.5,0.5,0.5), (0.5,0.5,0.5))])
@@ -38,12 +40,13 @@ class GANDataset(Dataset):
         self.real_frame_sample_size = config['real_frame_sample_size'] 
         # Audio
         self.audio_frame_size = config['audio_frame_size']
+        self.audio_sample_rate = config['audio_sample_rate']
         # Files
         self.videos = [f'{self.video_path}/{vid}'
-                       for vid in os.listdir(self.video_path)][7:20]
+                       for vid in os.listdir(self.video_path)]
         # Build wav file from video filename
         self.wavs = [f"{self.audio_path}/{vid.split('.')[0]}.wav"
-                     for vid in os.listdir(self.video_path)][7:20]            
+                     for vid in os.listdir(self.video_path)]
 
     def __len__(self):
         return len(self.videos)
@@ -58,24 +61,38 @@ class GANDataset(Dataset):
             and audio file {self.wavs[idx]} are not the same!'''
         # Cut video
         sample_rate, audio = wavfile.read(f'{self.wavs[idx]}')
-        video = read_video(self.videos[idx]) / 255
+        video = read_video(self.videos[idx])
+        video = torch.stack([align_image(img, 
+                                         self.img_size,
+                                         face_alignment_mean_points)
+                             for img in video])
+        save_image(video, 'real.png')
         video = self.img_transform(video)
         video_blocks = cut_video_sequence(video, self.img_frames_per_audio_clip)
         video_frame_subset = sample_frames(video, self.real_frame_sample_size)
-        # Cut audio 1 clip per frame
-        cutting_stride = int(sample_rate / self.fps)
-        audio_frame_feat_len = int(sample_rate * self.audio_frame_size)
+        # Audio Processing
+        audio = torch.tensor(audio)
+        # For stero audio ie: 2 channels
+        if audio.shape[-1] == 2:
+            audio = torch.sum(audio, dim=-1) / 2
+        if self.audio_sample_rate != sample_rate:
+            audio = resample_audio(audio, sample_rate, self.audio_sample_rate)
+        # Normalize audio
+        audio = audio / torch.max(audio)
+        cutting_stride = int(self.audio_sample_rate / self.fps)
+        audio_frame_feat_len = int(self.audio_sample_rate * self.audio_frame_size)
         audio_padding = audio_frame_feat_len - cutting_stride
+        # Cut audio 1 clip per frame
         audio_generator_input = cut_audio_sequence(
-            torch.tensor(audio).view(-1, 1),
+            audio.view(-1, 1),
             cutting_stride,
             audio_padding,
             audio_frame_feat_len)
         # Split audio into 0.2s chunks for sync_discriminator
         audio_chunks = split_audio(
-            torch.tensor(audio).view(-1, 1),
-            sample_rate, 
-            self.audio_frame_size)
+            audio.view(-1, 1),
+            self.audio_sample_rate, 
+            self.audio_frame_size) 
         datapoint = {
             # Discriminator inputs
             'real_video_all': video,
@@ -129,6 +146,26 @@ def ensure_equal(video_path, audio_path):
     assert len([a for a in os.listdir(audio_path)]) == len([a for a in os.listdir(video_path)]), \
         'Unequal lengths error in code!!!'
         
+    
+def rm_uneven(video_path, audio_path, sr, fps, frame_size):
+    audios = [a.split('.')[0] for a in os.listdir(audio_path)]
+    videos = [v.split('.')[0] for v in os.listdir(video_path)]
+    for i, video in enumerate(tqdm(videos)):
+        sr, audio = wavfile.read(f'{audio_path}/{audios[i]}.wav')
+        video = read_video(f'{video_path}/{video}.flv')
+        cutting_stride = int(sr / fps)
+        audio_frame_feat_len = int(sr * frame_size)
+        audio_padding = audio_frame_feat_len - cutting_stride
+        audio_generator_input = cut_audio_sequence(
+            torch.tensor(audio).unsqueeze(1),
+            cutting_stride,
+            audio_padding,
+            audio_frame_feat_len)
+        print(video.size())
+        print(audio_generator_input.size())
+        
+    
+        
 def get_max_min_frames_per_video():
     vs = []
     root = '/home/j/Desktop/Programming/AI/DeepLearning/la_solitudine/avatar/realistic/data/datasets/processed/VideoFlash'
@@ -136,6 +173,4 @@ def get_max_min_frames_per_video():
         video = read_video(f'{root}/{vid}')
         vs.append(video.shape[0])
     return min(vs), max(vs), vs
-    
-    
     

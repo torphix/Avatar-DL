@@ -1,11 +1,18 @@
 import os
-import cv2
+import math
 import torch
 import shutil
-import math
-import torch.nn.functional as F
+import skvideo.io
 from tqdm import tqdm
+from scipy import signal
 from scipy.io import wavfile
+import torch.nn.functional as F
+import os
+import torch
+import numpy as np
+from skvideo import io
+from pytube import YouTube
+from moviepy.editor import VideoFileClip
 
 
 def get_dataset(dataset_name):
@@ -70,12 +77,16 @@ def shuffle_audio(audio_blocks):
     audio_blocks = audio_blocks[:, shuffle_idx, :, :]
     return audio_blocks
 
-# Video
-import skvideo.io
+def resample_audio(audio, target_sample_rate, current_audio_rate):
+    seq_len = audio.shape[0]
+    return torch.from_numpy(
+                signal.resample(audio,
+                                int(seq_len * current_audio_rate / float(target_sample_rate)))).float()
 
+# Video
 def read_video(vid_path):
     vid_data = skvideo.io.vread(vid_path)
-    return torch.tensor(vid_data).permute(0, 3, 1, 2)
+    return torch.tensor(vid_data)
 
 def cut_video_sequence(video, frames_per_block):
     # Split video into list of blocks of 5 frames
@@ -93,4 +104,3 @@ def sample_frames(video, sample_size):
     selection_idx = torch.randperm(sample_size)
     real_frames = video[selection_idx, :, :, :]
     return real_frames
-

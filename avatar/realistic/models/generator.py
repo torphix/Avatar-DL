@@ -120,10 +120,7 @@ class Encoder(nn.Module):
     def forward(self, img, audio):
         audio = audio
         BS, L , N = audio.size()
-        noise = torch.normal(mean=0., 
-                             std=torch.tensor(0.6),
-                             size=(BS, 1, 10),
-                             device=self.device)
+        noise = torch.FloatTensor(BS, 1, 256).normal_(0, 0.33).to(self.device)
         img = img.expand(audio.size(0), 
                          *img.shape[1:])
         noise_z, h_0 = self.noise_encoder(noise)
@@ -131,7 +128,7 @@ class Encoder(nn.Module):
         img_zs = self.image_encoder(img)
         out = torch.cat((img_zs[-1],
                          audio_z,
-                         noise_z.transpose(1,2).squeeze(-1)),
+                         noise_z.squeeze(1)),
                          dim=-1)
         return out, img_zs
 

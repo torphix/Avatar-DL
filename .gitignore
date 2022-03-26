@@ -3,3 +3,4 @@ raw
 test
 processed
 saved_models
+lightning_logs
