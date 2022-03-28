@@ -1,14 +1,11 @@
+from email.mime import audio
 import os
-from re import S
 import torch
-import random
-from scipy.io import wavfile
-import skvideo.io
-from scipy import signal
-from torch.utils.data import Dataset
-from torchvision import transforms
-import numpy as np
 from tqdm import tqdm
+from natsort import natsorted
+from scipy.io import wavfile
+from torchvision import transforms
+from torch.utils.data import Dataset
 from torchvision.utils import save_image
 from . import face_alignment_mean_points
 from .utils import (cut_audio_sequence, 
@@ -27,7 +24,16 @@ class GANDataset(Dataset):
             "Dataset names 'lex' or 'crema' currently supported"
         self.audio_path = os.path.abspath(f'{root}/processed/{config["name"]}/AudioWAV')
         self.video_path = os.path.abspath(f'{root}/processed/{config["name"]}/VideoFlash')
-        
+        audio_folders = [folder for folder in os.listdir(self.audio_path)]
+        video_folders = [folder for folder in os.listdir(self.video_path)]
+        self.wavs = natsorted([
+                       f'{self.audio_path}/{folder}/{file}'
+                       for folder in audio_folders
+                       for file in os.listdir(f'{self.audio_path}/{folder}')])
+        self.videos = natsorted([
+                       f'{self.video_path}/{folder}/{file}'
+                       for folder in video_folders
+                       for file in os.listdir(f'{self.video_path}/{folder}')])
         # Video settings
         self.fps = config['fps']
         self.img_size = config['img_size']
@@ -41,12 +47,6 @@ class GANDataset(Dataset):
         # Audio
         self.audio_frame_size = config['audio_frame_size']
         self.audio_sample_rate = config['audio_sample_rate']
-        # Files
-        self.videos = [f'{self.video_path}/{vid}'
-                       for vid in os.listdir(self.video_path)]
-        # Build wav file from video filename
-        self.wavs = [f"{self.audio_path}/{vid.split('.')[0]}.wav"
-                     for vid in os.listdir(self.video_path)]
 
     def __len__(self):
         return len(self.videos)
@@ -61,15 +61,9 @@ class GANDataset(Dataset):
             and audio file {self.wavs[idx]} are not the same!'''
         # Cut video
         sample_rate, audio = wavfile.read(f'{self.wavs[idx]}')
-        video = read_video(self.videos[idx])
-        video = torch.stack([align_image(img, 
-                                         self.img_size,
-                                         face_alignment_mean_points)
-                             for img in video])
-        save_image(video, 'real.png')
+        video = read_video(self.videos[idx]) / 255
         video = self.img_transform(video)
-        video_blocks = cut_video_sequence(video, self.img_frames_per_audio_clip)
-        video_frame_subset = sample_frames(video, self.real_frame_sample_size)
+
         # Audio Processing
         audio = torch.tensor(audio)
         # For stero audio ie: 2 channels
@@ -88,11 +82,16 @@ class GANDataset(Dataset):
             cutting_stride,
             audio_padding,
             audio_frame_feat_len)
+        # Crop to same length
+        video, audio_generator_input = crop_to_same(video, audio_generator_input)
         # Split audio into 0.2s chunks for sync_discriminator
         audio_chunks = split_audio(
             audio.view(-1, 1),
             self.audio_sample_rate, 
-            self.audio_frame_size) 
+            self.audio_frame_size)
+        video_blocks = cut_video_sequence(video, self.img_frames_per_audio_clip)
+        video_frame_subset = sample_frames(video, self.real_frame_sample_size) 
+        # Crop to same length
         datapoint = {
             # Discriminator inputs
             'real_video_all': video,
@@ -107,6 +106,14 @@ class GANDataset(Dataset):
             'audio_generator_input': audio_generator_input,
         }
         return datapoint
+
+def crop_to_same(vid_frames, audio_frames):
+    print(audio_frames.shape, vid_frames.shape[0])
+    if vid_frames.shape[0] > audio_frames.shape[0]:
+        vid_frames[:audio_frames.shape[0],:,:,:]
+    if audio_frames.shape[0] > vid_frames.shape[0]:
+        audio_frames[:vid_frames.shape[0],:,:]
+    return vid_frames, audio_frames
 
 
 def test_sample_dataset():

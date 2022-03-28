@@ -2,18 +2,11 @@ import os
 import math
 import torch
 import shutil
-import skvideo.io
 from tqdm import tqdm
 from scipy import signal
 from scipy.io import wavfile
 import torch.nn.functional as F
-import os
-import torch
-import numpy as np
-from skvideo import io
-from pytube import YouTube
-from moviepy.editor import VideoFileClip
-
+from moviepy.video.io.VideoFileClip import VideoFileClip
 
 def get_dataset(dataset_name):
     if dataset_name == 'crema':
@@ -85,8 +78,9 @@ def resample_audio(audio, target_sample_rate, current_audio_rate):
 
 # Video
 def read_video(vid_path):
-    vid_data = skvideo.io.vread(vid_path)
-    return torch.tensor(vid_data)
+    vid_data = VideoFileClip(vid_path)
+    frames = torch.stack([torch.tensor(frame) for frame in vid_data.iter_frames()])
+    return frames.permute(0, 3, 1, 2).contiguous()
 
 def cut_video_sequence(video, frames_per_block):
     # Split video into list of blocks of 5 frames

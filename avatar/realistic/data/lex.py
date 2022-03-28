@@ -1,4 +1,3 @@
-import re
 import os
 import numpy as np
 from tqdm import tqdm
@@ -6,20 +5,40 @@ from pytube import YouTube
 from pydub import AudioSegment, silence
 from moviepy.audio.AudioClip import AudioArrayClip
 from moviepy.editor import VideoFileClip, ImageSequenceClip
-from utils import get_cut_idxs_for_video, remove_short_clips, remove_uneven_clips
+
+
+def create_lex_dataset(links,
+                       silence_length_crop,
+                       video_fps,
+                       max_frames,
+                       min_frame_len,
+                       max_frame_len):
+    data_handler = LexDataHandler(
+                        links,
+                        silence_length_crop,
+                        video_fps,
+                        max_frames,
+                        min_frame_len,
+                        max_frame_len,
+                        )
+    data_handler.start()
+    # align_dataset([f'{root_input}/{file}' for file in os.listdir(root_input)])    
+    
 
 class LexDataHandler(object):
-
     def __init__(self,
                  links, 
                  silence_length_crop,
                  video_fps,
-                 max_frames=1500,
-                 min_frame_len=1000) -> None:
+                 max_frames,
+                 min_frame_len,
+                 max_frame_len,
+                 ) -> None:
         '''
         links: Youtube links
         silence_length_crop: in milli seconds
         max_frames: if memory contraint is a problem -1 for no limit
+        max_frame_len: removes clips & audio if len is >= in ms
         min_frame_len: removes clips & audio if len is <= in ms
         '''
         self.video_fps = video_fps
@@ -27,6 +46,7 @@ class LexDataHandler(object):
         self.silence_length_crop = silence_length_crop
         self.max_frames = max_frames
         self.min_frame_len = min_frame_len
+        self.max_frame_len = max_frame_len
 
     def start(self):
         print('Starting youtube download')
@@ -42,10 +62,11 @@ class LexDataHandler(object):
     def save_audio_and_video(self, idx, f_name, clip, audio, fps):
         print('Saving video')
         abs_path = os.path.abspath('.')
-        os.makedirs(f'{abs_path}/lex/data/processed/VideoFlash/{f_name}', exist_ok=True)
-        os.makedirs(f'{abs_path}/lex/data/processed/AudioWAV/{f_name}', exist_ok=True)
-        video_root = f'{abs_path}/lex/data/processed/VideoFlash/{f_name}/'
-        audio_root = f'{abs_path}/lex/data/processed/AudioWAV/{f_name}/'
+        lex_processed_data_path = 'avatar/realistic/data/datasets/processed/lex'
+        os.makedirs(f'{abs_path}/{lex_processed_data_path}/VideoFlash/{f_name}', exist_ok=True)
+        os.makedirs(f'{abs_path}/{lex_processed_data_path}/AudioWAV/{f_name}', exist_ok=True)
+        video_root = f'{abs_path}/{lex_processed_data_path}/VideoFlash/{f_name}'
+        audio_root = f'{abs_path}/{lex_processed_data_path}/AudioWAV/{f_name}'
         clip = ImageSequenceClip([frame for frame in clip], fps=fps)
         clip.write_videofile(f'{video_root}/{idx}_{f_name}.mp4', fps)
         audio.export(f'{audio_root}/{idx}_{f_name}.wav', format='wav')
@@ -56,16 +77,17 @@ class LexDataHandler(object):
         yt = YouTube(link)
         new_title = yt.title.split(':')[0].replace(' ', '_').lower()
         abs_path = os.path.abspath('.')
-        new_path = f'{abs_path}/lex/data/raw/{new_title}.mp4'
-        with open('lex/data/download_log.txt', 'r') as f:
+        raw_path = 'avatar/realistic/data/datasets/raw/lex'
+        new_path = f'{abs_path}/{raw_path}/{new_title}.mp4'
+        with open(f'{raw_path}/download_log.txt', 'r') as f:
             log = f.readlines()
             log = [name.strip('\n') for name in log]
         if new_title in log: return new_path, new_title
         else: 
-            with open('lex/data/download_log.txt', 'a') as f:
+            with open(f'{raw_path}/download_log.txt', 'a') as f:
                 f.write(f'\n{new_title}')
-                
-        yt.streams.get_by_itag(22).download('lex/data/raw', f'{new_title}.mp4')
+        print(raw_path)
+        yt.streams.get_by_itag(22).download(f'{raw_path}', f'{new_title}.mp4')
 
         print('Download Complete')
         return new_path, new_title
@@ -129,52 +151,60 @@ class LexDataHandler(object):
         movie_clip_cut_idxs = get_cut_idxs_for_video(movie_clip_lens)
         movie_clips = np.split(intro_frames, movie_clip_cut_idxs)[:-1]
         movie_clips, audio_clips = remove_short_clips(movie_clips, audio_clips, fps, self.min_frame_len)
-        movie_clips, audio_clips = remove_uneven_clips(movie_clips, audio_clips, fps, clip.audio.fps, threshold=0.1)
+        movie_clips, audio_clips = remove_long_clips(movie_clips, audio_clips, fps, self.max_frame_len)
+        # Crop uneven clips (do this in dataset)
+        # movie_clips, audio_clips = make_clips_even(movie_clips, audio_clips, fps, clip.audio.fps)
         assert len(audio_clips) == len(movie_clips),\
             f'Audio clips {len(audio_clips)}, Movie clips {len(movie_clips)} unequal'
-            
         return movie_clips, audio_clips, fps
         
-        
-LINKS = [
-    'https://www.youtube.com/watch?v=ez773teNFYA',
-    # 'https://www.youtube.com/watch?v=LDTe8uFqbws',
-    # 'https://www.youtube.com/watch?v=EYIKy_FM9x0',
-    # 'https://www.youtube.com/watch?v=uPUEq8d73JI',
-    # 'https://www.youtube.com/watch?v=E1AxVXt2Gv4',
-    # 'https://www.youtube.com/watch?v=8A-5gIW0-eI',
-    # 'https://www.youtube.com/watch?v=13CZPWmke6A',
-    # 'https://www.youtube.com/watch?v=U5OD8MjYnOM',
-    # 'https://www.youtube.com/watch?v=TRdL6ZzWBS0',
-    ]
-silence_length_crop = 600
-max_frames = 4000
-min_frame_len = 1000
-video_fps = 25
+    
+    
+def seperate_video(file_name, input_path, output_path):
+    video = VideoFileClip(f'{input_path}/{file_name}')
+    video.write_videofile(f'{output_path}/VideoFlash/{file_name}.mp4', audio=False)
+    video.audio.write_audiofile(f'{output_path}/AudioWAV/{file_name}.wav')
+    
 
-data_handler = LexDataHandler(LINKS,
-                              silence_length_crop,
-                              25,
-                              max_frames,
-                              min_frame_len)
-data_handler.start()
-# movie_clips, audio_clips, fps = data_handler.process_video('/home/j/Desktop/Programming/AI/DeepLearning/la_solitudine/lex/data/raw/david_silver.mp4')
-# for idx, clip in enumerate(movie_clips):
-    # data_handler.save_audio_and_video(idx,
-                                    #   'david_silver',
-                                    #   clip,
-                                    #   audio_clips[idx],
-                                    #   fps)
-'''
-Test class
-1. Download link
-2. Find & crop out intro
-3. Crop intro by silence frames
-4. Reduce height and width of images
-5. Save clips and audio
-# Next
-6. Align to face
-7. Create dataset
-8. Train
-9. 
-'''
+def get_cut_idxs_for_video(clips_lens):
+    running_idx = 0
+    movie_clip_cut_idxs = []
+    for mcl in clips_lens:
+        running_idx += mcl
+        movie_clip_cut_idxs.append(running_idx)
+    return movie_clip_cut_idxs
+
+def remove_short_clips(movie_clips, audio_clips, fps, min_len):
+    for i, clip in enumerate(movie_clips):
+        print(clip.shape[0])
+        if (clip.shape[0]/fps)*1000 <= min_len:
+            del movie_clips[i]
+            del audio_clips[i]
+        
+    return movie_clips, audio_clips
+
+def remove_long_clips(movie_clips, audio_clips, fps, max_len):
+    for i, clip in enumerate(movie_clips):
+        if (clip.shape[0]/fps)*1000 >= max_len:
+            del movie_clips[i]
+            del audio_clips[i]
+        
+    return movie_clips, audio_clips
+
+
+def make_clips_even(movie_clips, audio_clips, fps, sr):
+    video_times = [clip.shape[0] / fps for clip in movie_clips]
+    audio_times = [audio.get_array_of_samples() / sr for audio in audio_clips]
+    for i in range(len(audio_times)):
+        # Video longer than audio
+        if video_times[i] - audio_times[i] > 0:
+            crop_to = video_times[i] - audio_times[i] * fps
+            movie_clips[i] = movie_clips[i][:-crop_to]
+        # Audio longer than video
+        elif audio_times[i] - video_times[i] > 0:
+            crop_to = audio_times[i] - video_times[i] * sr
+            audio_clips[i] = audio_clips[i][:-crop_to]
+        # assert (audio_clips[i].shape / sr) == movie_clips[i].shape / fps, \
+        #     f'Clips are uneven check func. Audio: {audio_clips[i].shape}, Video: {movie_clips[i].shape}'
+    return movie_clips, audio_clips
+            

@@ -1,0 +1,8 @@
+silence_length_crop: 500 # in ms
+video_fps: 25
+max_frames: 5000 # num of frames to read from intro
+clip_min_len: 1000 # min clip len in ms
+clip_max_len: 5000 # in ms
+links: [
+  "https://www.youtube.com/watch?v=PbN3HzKkW4M"
+]
