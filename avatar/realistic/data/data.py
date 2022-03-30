@@ -105,6 +105,7 @@ class GANDataset(Dataset):
             'identity_frame': video[0],
             'audio_generator_input': audio_generator_input,
         }
+        save_image((video[0]+0.5)*0.5, 'testing.png')
         return datapoint
 
 def crop_to_same(vid_frames, audio_frames):

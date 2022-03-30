@@ -142,6 +142,11 @@ class TrainModule(ptl.LightningModule):
         real_frames = real_frames[:real_frames.size(0), :, :, :]
         fake_frames = fake_frames[:real_frames.size(0), :, :, :]
         save_image(fake_frames, 'fake.png')
+        print(fake_frames.shape, real_frames.shape)
+        if fake_frames.shape[0] > real_frames.shape[0]:
+            fake_frames = fake_frames[:real_frames.shape[0],:,:,:]
+        if real_frames.shape[0] > fake_frames.shape[0]:
+            real_frames = real_frames[:fake_frames.shape[0],:,:,:]
         loss = F.l1_loss(fake_frames, real_frames)
         return loss
     
@@ -182,7 +187,7 @@ class TrainModule(ptl.LightningModule):
             generated_images = self.forward(identity_frame, audio_frames)
             fake_outputs = self.d_fake_inference(batch, generated_images)
             real_outputs = self.d_real_inference(batch)
-            outputs = fake_outputs | real_outputs
+            outputs = {**fake_outputs, **real_outputs}
             d_loss = self.d_loss(outputs)
             tqdm_dict = {'d_loss', d_loss.detach()}
             print(f'Discriminator Loss: {d_loss}')
@@ -205,15 +210,22 @@ def train():
         
     ckpt_path = trainer_config['checkpoint_path']
     trainer_config.pop('checkpoint_path')
+    if trainer_config['model_dir'] != '':
+        print('Loading Saved Models...')
+        module.generator.load_state_dict(torch.load(f"{trainer_config['model_dir']}/generator.pth"))
+        module.sync_discriminator.load_state_dict(torch.load(f"{trainer_config['model_dir']}/sync_discriminator.pth"))
+        module.frame_discriminator.load_state_dict(torch.load(f"{trainer_config['model_dir']}/frame_discriminator.pth"))
+        module.video_discriminator.load_state_dict(torch.load(f"{trainer_config['model_dir']}/video_discriminator.pth"))
+        trainer_config.pop('model_dir')
     
     trainer = Trainer(**trainer_config)
     trainer.fit(module, ckpt_path=ckpt_path)
     
-    os.makedirs(f'saved_models/{trainer_config["min_epochs"]}', exist_ok=True)
-    torch.save(module.generator.state_dict(), f'saved_models/{trainer_config["min_epochs"]}/generator.pth')
-    torch.save(module.sync_discriminator.state_dict(), f'saved_models/{trainer_config["min_epochs"]}/sync_discriminator.pth')
-    torch.save(module.frame_discriminator.state_dict(), f'saved_models/{trainer_config["min_epochs"]}/frame_discriminator.pth')
-    torch.save(module.video_discriminator.state_dict(), f'saved_models/{trainer_config["min_epochs"]}/video_discriminator.pth')
+    os.makedirs(f'avatar/realistic/saved_models/{trainer_config["min_epochs"]}', exist_ok=True)
+    torch.save(module.generator.state_dict(), f'avatar/realistic/saved_models/{trainer_config["min_epochs"]}/generator.pth')
+    torch.save(module.sync_discriminator.state_dict(), f'avatar/realistic/saved_models/{trainer_config["min_epochs"]}/sync_discriminator.pth')
+    torch.save(module.frame_discriminator.state_dict(), f'avatar/realistic/saved_models/{trainer_config["min_epochs"]}/frame_discriminator.pth')
+    torch.save(module.video_discriminator.state_dict(), f'avatar/realistic/saved_models/{trainer_config["min_epochs"]}/video_discriminator.pth')
     
     
     # Next:

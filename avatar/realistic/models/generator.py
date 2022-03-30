@@ -13,8 +13,8 @@ class ImageEncoder(nn.Module):
         else:
             stable_dim = min(img_size)
         # TODO: Hard coded should be variable
-        final_size_h = int(4 * img_size[0] // stable_dim)+3
-        final_size_w = int(4 * img_size[1] // stable_dim)+4
+        final_size_h = int(4 * img_size[0] // stable_dim)+4
+        final_size_w = int(4 * img_size[1] // stable_dim)+3
         padding = calculate_padding(config['kernel_size'], 
                                     config['stride'])
         num_layers = int(math.log2(max(img_size)))-2
@@ -130,6 +130,7 @@ class Encoder(nn.Module):
                          audio_z,
                          noise_z.squeeze(1)),
                          dim=-1)
+
         return out, img_zs
 
 

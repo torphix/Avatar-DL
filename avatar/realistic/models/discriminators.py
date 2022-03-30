@@ -29,7 +29,7 @@ class FrameDiscriminator(nn.Module):
                     nn.LeakyReLU(0.2, True)))
         self.layers.append(
             nn.Sequential(
-                nn.Conv2d(config['feature_sizes'][-1], 1, (7,8)),
+                nn.Conv2d(config['feature_sizes'][-1], 1, (8,7)),
                 nn.Sigmoid()))
         # (10, 12)
 

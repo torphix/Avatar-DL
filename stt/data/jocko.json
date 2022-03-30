@@ -1,0 +1,777 @@
+{
+    "root_path": "/home/j/Desktop/Programming/AI/DeepLearning/la_solitudine/stt/data/processed",
+    "samples": [
+        {
+            "transcript_path": "1_jocko.txt",
+            "wav_path": "1_jocko.wav"
+        },
+        {
+            "transcript_path": "2_jocko.txt",
+            "wav_path": "2_jocko.wav"
+        },
+        {
+            "transcript_path": "3_jocko.txt",
+            "wav_path": "3_jocko.wav"
+        },
+        {
+            "transcript_path": "4_jocko.txt",
+            "wav_path": "4_jocko.wav"
+        },
+        {
+            "transcript_path": "5_jocko.txt",
+            "wav_path": "5_jocko.wav"
+        },
+        {
+            "transcript_path": "6_jocko.txt",
+            "wav_path": "6_jocko.wav"
+        },
+        {
+            "transcript_path": "7_jocko.txt",
+            "wav_path": "7_jocko.wav"
+        },
+        {
+            "transcript_path": "8_jocko.txt",
+            "wav_path": "8_jocko.wav"
+        },
+        {
+            "transcript_path": "9_jocko.txt",
+            "wav_path": "9_jocko.wav"
+        },
+        {
+            "transcript_path": "10_jocko.txt",
+            "wav_path": "10_jocko.wav"
+        },
+        {
+            "transcript_path": "11_jocko.txt",
+            "wav_path": "11_jocko.wav"
+        },
+        {
+            "transcript_path": "12_jocko.txt",
+            "wav_path": "12_jocko.wav"
+        },
+        {
+            "transcript_path": "13_jocko.txt",
+            "wav_path": "13_jocko.wav"
+        },
+        {
+            "transcript_path": "14_jocko.txt",
+            "wav_path": "14_jocko.wav"
+        },
+        {
+            "transcript_path": "15_jocko.txt",
+            "wav_path": "15_jocko.wav"
+        },
+        {
+            "transcript_path": "16_jocko.txt",
+            "wav_path": "16_jocko.wav"
+        },
+        {
+            "transcript_path": "17_jocko.txt",
+            "wav_path": "17_jocko.wav"
+        },
+        {
+            "transcript_path": "18_jocko.txt",
+            "wav_path": "18_jocko.wav"
+        },
+        {
+            "transcript_path": "19_jocko.txt",
+            "wav_path": "19_jocko.wav"
+        },
+        {
+            "transcript_path": "20_jocko.txt",
+            "wav_path": "20_jocko.wav"
+        },
+        {
+            "transcript_path": "21_jocko.txt",
+            "wav_path": "21_jocko.wav"
+        },
+        {
+            "transcript_path": "22_jocko.txt",
+            "wav_path": "22_jocko.wav"
+        },
+        {
+            "transcript_path": "23_jocko.txt",
+            "wav_path": "23_jocko.wav"
+        },
+        {
+            "transcript_path": "24_jocko.txt",
+            "wav_path": "24_jocko.wav"
+        },
+        {
+            "transcript_path": "25_jocko.txt",
+            "wav_path": "25_jocko.wav"
+        },
+        {
+            "transcript_path": "26_jocko.txt",
+            "wav_path": "26_jocko.wav"
+        },
+        {
+            "transcript_path": "27_jocko.txt",
+            "wav_path": "27_jocko.wav"
+        },
+        {
+            "transcript_path": "28_jocko.txt",
+            "wav_path": "28_jocko.wav"
+        },
+        {
+            "transcript_path": "29_jocko.txt",
+            "wav_path": "29_jocko.wav"
+        },
+        {
+            "transcript_path": "30_jocko.txt",
+            "wav_path": "30_jocko.wav"
+        },
+        {
+            "transcript_path": "31_jocko.txt",
+            "wav_path": "31_jocko.wav"
+        },
+        {
+            "transcript_path": "32_jocko.txt",
+            "wav_path": "32_jocko.wav"
+        },
+        {
+            "transcript_path": "33_jocko.txt",
+            "wav_path": "33_jocko.wav"
+        },
+        {
+            "transcript_path": "34_jocko.txt",
+            "wav_path": "34_jocko.wav"
+        },
+        {
+            "transcript_path": "35_jocko.txt",
+            "wav_path": "35_jocko.wav"
+        },
+        {
+            "transcript_path": "36_jocko.txt",
+            "wav_path": "36_jocko.wav"
+        },
+        {
+            "transcript_path": "37_jocko.txt",
+            "wav_path": "37_jocko.wav"
+        },
+        {
+            "transcript_path": "38_jocko.txt",
+            "wav_path": "38_jocko.wav"
+        },
+        {
+            "transcript_path": "39_jocko.txt",
+            "wav_path": "39_jocko.wav"
+        },
+        {
+            "transcript_path": "40_jocko.txt",
+            "wav_path": "40_jocko.wav"
+        },
+        {
+            "transcript_path": "41_jocko.txt",
+            "wav_path": "41_jocko.wav"
+        },
+        {
+            "transcript_path": "42_jocko.txt",
+            "wav_path": "42_jocko.wav"
+        },
+        {
+            "transcript_path": "43_jocko.txt",
+            "wav_path": "43_jocko.wav"
+        },
+        {
+            "transcript_path": "44_jocko.txt",
+            "wav_path": "44_jocko.wav"
+        },
+        {
+            "transcript_path": "45_jocko.txt",
+            "wav_path": "45_jocko.wav"
+        },
+        {
+            "transcript_path": "46_jocko.txt",
+            "wav_path": "46_jocko.wav"
+        },
+        {
+            "transcript_path": "47_jocko.txt",
+            "wav_path": "47_jocko.wav"
+        },
+        {
+            "transcript_path": "48_jocko.txt",
+            "wav_path": "48_jocko.wav"
+        },
+        {
+            "transcript_path": "49_jocko.txt",
+            "wav_path": "49_jocko.wav"
+        },
+        {
+            "transcript_path": "50_jocko.txt",
+            "wav_path": "50_jocko.wav"
+        },
+        {
+            "transcript_path": "51_jocko.txt",
+            "wav_path": "51_jocko.wav"
+        },
+        {
+            "transcript_path": "52_jocko.txt",
+            "wav_path": "52_jocko.wav"
+        },
+        {
+            "transcript_path": "53_jocko.txt",
+            "wav_path": "53_jocko.wav"
+        },
+        {
+            "transcript_path": "54_jocko.txt",
+            "wav_path": "54_jocko.wav"
+        },
+        {
+            "transcript_path": "55_jocko.txt",
+            "wav_path": "55_jocko.wav"
+        },
+        {
+            "transcript_path": "56_jocko.txt",
+            "wav_path": "56_jocko.wav"
+        },
+        {
+            "transcript_path": "57_jocko.txt",
+            "wav_path": "57_jocko.wav"
+        },
+        {
+            "transcript_path": "58_jocko.txt",
+            "wav_path": "58_jocko.wav"
+        },
+        {
+            "transcript_path": "59_jocko.txt",
+            "wav_path": "59_jocko.wav"
+        },
+        {
+            "transcript_path": "60_jocko.txt",
+            "wav_path": "60_jocko.wav"
+        },
+        {
+            "transcript_path": "61_jocko.txt",
+            "wav_path": "61_jocko.wav"
+        },
+        {
+            "transcript_path": "62_jocko.txt",
+            "wav_path": "62_jocko.wav"
+        },
+        {
+            "transcript_path": "63_jocko.txt",
+            "wav_path": "63_jocko.wav"
+        },
+        {
+            "transcript_path": "64_jocko.txt",
+            "wav_path": "64_jocko.wav"
+        },
+        {
+            "transcript_path": "65_jocko.txt",
+            "wav_path": "65_jocko.wav"
+        },
+        {
+            "transcript_path": "66_jocko.txt",
+            "wav_path": "66_jocko.wav"
+        },
+        {
+            "transcript_path": "67_jocko.txt",
+            "wav_path": "67_jocko.wav"
+        },
+        {
+            "transcript_path": "68_jocko.txt",
+            "wav_path": "68_jocko.wav"
+        },
+        {
+            "transcript_path": "69_jocko.txt",
+            "wav_path": "69_jocko.wav"
+        },
+        {
+            "transcript_path": "70_jocko.txt",
+            "wav_path": "70_jocko.wav"
+        },
+        {
+            "transcript_path": "71_jocko.txt",
+            "wav_path": "71_jocko.wav"
+        },
+        {
+            "transcript_path": "72_jocko.txt",
+            "wav_path": "72_jocko.wav"
+        },
+        {
+            "transcript_path": "73_jocko.txt",
+            "wav_path": "73_jocko.wav"
+        },
+        {
+            "transcript_path": "74_jocko.txt",
+            "wav_path": "74_jocko.wav"
+        },
+        {
+            "transcript_path": "75_jocko.txt",
+            "wav_path": "75_jocko.wav"
+        },
+        {
+            "transcript_path": "76_jocko.txt",
+            "wav_path": "76_jocko.wav"
+        },
+        {
+            "transcript_path": "77_jocko.txt",
+            "wav_path": "77_jocko.wav"
+        },
+        {
+            "transcript_path": "78_jocko.txt",
+            "wav_path": "78_jocko.wav"
+        },
+        {
+            "transcript_path": "79_jocko.txt",
+            "wav_path": "79_jocko.wav"
+        },
+        {
+            "transcript_path": "80_jocko.txt",
+            "wav_path": "80_jocko.wav"
+        },
+        {
+            "transcript_path": "81_jocko.txt",
+            "wav_path": "81_jocko.wav"
+        },
+        {
+            "transcript_path": "82_jocko.txt",
+            "wav_path": "82_jocko.wav"
+        },
+        {
+            "transcript_path": "83_jocko.txt",
+            "wav_path": "83_jocko.wav"
+        },
+        {
+            "transcript_path": "84_jocko.txt",
+            "wav_path": "84_jocko.wav"
+        },
+        {
+            "transcript_path": "85_jocko.txt",
+            "wav_path": "85_jocko.wav"
+        },
+        {
+            "transcript_path": "86_jocko.txt",
+            "wav_path": "86_jocko.wav"
+        },
+        {
+            "transcript_path": "87_jocko.txt",
+            "wav_path": "87_jocko.wav"
+        },
+        {
+            "transcript_path": "88_jocko.txt",
+            "wav_path": "88_jocko.wav"
+        },
+        {
+            "transcript_path": "89_jocko.txt",
+            "wav_path": "89_jocko.wav"
+        },
+        {
+            "transcript_path": "90_jocko.txt",
+            "wav_path": "90_jocko.wav"
+        },
+        {
+            "transcript_path": "91_jocko.txt",
+            "wav_path": "91_jocko.wav"
+        },
+        {
+            "transcript_path": "92_jocko.txt",
+            "wav_path": "92_jocko.wav"
+        },
+        {
+            "transcript_path": "93_jocko.txt",
+            "wav_path": "93_jocko.wav"
+        },
+        {
+            "transcript_path": "94_jocko.txt",
+            "wav_path": "94_jocko.wav"
+        },
+        {
+            "transcript_path": "95_jocko.txt",
+            "wav_path": "95_jocko.wav"
+        },
+        {
+            "transcript_path": "96_jocko.txt",
+            "wav_path": "96_jocko.wav"
+        },
+        {
+            "transcript_path": "97_jocko.txt",
+            "wav_path": "97_jocko.wav"
+        },
+        {
+            "transcript_path": "98_jocko.txt",
+            "wav_path": "98_jocko.wav"
+        },
+        {
+            "transcript_path": "99_jocko.txt",
+            "wav_path": "99_jocko.wav"
+        },
+        {
+            "transcript_path": "100_jocko.txt",
+            "wav_path": "100_jocko.wav"
+        },
+        {
+            "transcript_path": "101_jocko.txt",
+            "wav_path": "101_jocko.wav"
+        },
+        {
+            "transcript_path": "102_jocko.txt",
+            "wav_path": "102_jocko.wav"
+        },
+        {
+            "transcript_path": "103_jocko.txt",
+            "wav_path": "103_jocko.wav"
+        },
+        {
+            "transcript_path": "104_jocko.txt",
+            "wav_path": "104_jocko.wav"
+        },
+        {
+            "transcript_path": "105_jocko.txt",
+            "wav_path": "105_jocko.wav"
+        },
+        {
+            "transcript_path": "106_jocko.txt",
+            "wav_path": "106_jocko.wav"
+        },
+        {
+            "transcript_path": "107_jocko.txt",
+            "wav_path": "107_jocko.wav"
+        },
+        {
+            "transcript_path": "108_jocko.txt",
+            "wav_path": "108_jocko.wav"
+        },
+        {
+            "transcript_path": "109_jocko.txt",
+            "wav_path": "109_jocko.wav"
+        },
+        {
+            "transcript_path": "110_jocko.txt",
+            "wav_path": "110_jocko.wav"
+        },
+        {
+            "transcript_path": "111_jocko.txt",
+            "wav_path": "111_jocko.wav"
+        },
+        {
+            "transcript_path": "112_jocko.txt",
+            "wav_path": "112_jocko.wav"
+        },
+        {
+            "transcript_path": "113_jocko.txt",
+            "wav_path": "113_jocko.wav"
+        },
+        {
+            "transcript_path": "114_jocko.txt",
+            "wav_path": "114_jocko.wav"
+        },
+        {
+            "transcript_path": "115_jocko.txt",
+            "wav_path": "115_jocko.wav"
+        },
+        {
+            "transcript_path": "116_jocko.txt",
+            "wav_path": "116_jocko.wav"
+        },
+        {
+            "transcript_path": "117_jocko.txt",
+            "wav_path": "117_jocko.wav"
+        },
+        {
+            "transcript_path": "118_jocko.txt",
+            "wav_path": "118_jocko.wav"
+        },
+        {
+            "transcript_path": "119_jocko.txt",
+            "wav_path": "119_jocko.wav"
+        },
+        {
+            "transcript_path": "120_jocko.txt",
+            "wav_path": "120_jocko.wav"
+        },
+        {
+            "transcript_path": "121_jocko.txt",
+            "wav_path": "121_jocko.wav"
+        },
+        {
+            "transcript_path": "122_jocko.txt",
+            "wav_path": "122_jocko.wav"
+        },
+        {
+            "transcript_path": "123_jocko.txt",
+            "wav_path": "123_jocko.wav"
+        },
+        {
+            "transcript_path": "124_jocko.txt",
+            "wav_path": "124_jocko.wav"
+        },
+        {
+            "transcript_path": "125_jocko.txt",
+            "wav_path": "125_jocko.wav"
+        },
+        {
+            "transcript_path": "126_jocko.txt",
+            "wav_path": "126_jocko.wav"
+        },
+        {
+            "transcript_path": "127_jocko.txt",
+            "wav_path": "127_jocko.wav"
+        },
+        {
+            "transcript_path": "128_jocko.txt",
+            "wav_path": "128_jocko.wav"
+        },
+        {
+            "transcript_path": "129_jocko.txt",
+            "wav_path": "129_jocko.wav"
+        },
+        {
+            "transcript_path": "130_jocko.txt",
+            "wav_path": "130_jocko.wav"
+        },
+        {
+            "transcript_path": "131_jocko.txt",
+            "wav_path": "131_jocko.wav"
+        },
+        {
+            "transcript_path": "132_jocko.txt",
+            "wav_path": "132_jocko.wav"
+        },
+        {
+            "transcript_path": "133_jocko.txt",
+            "wav_path": "133_jocko.wav"
+        },
+        {
+            "transcript_path": "134_jocko.txt",
+            "wav_path": "134_jocko.wav"
+        },
+        {
+            "transcript_path": "135_jocko.txt",
+            "wav_path": "135_jocko.wav"
+        },
+        {
+            "transcript_path": "136_jocko.txt",
+            "wav_path": "136_jocko.wav"
+        },
+        {
+            "transcript_path": "137_jocko.txt",
+            "wav_path": "137_jocko.wav"
+        },
+        {
+            "transcript_path": "138_jocko.txt",
+            "wav_path": "138_jocko.wav"
+        },
+        {
+            "transcript_path": "139_jocko.txt",
+            "wav_path": "139_jocko.wav"
+        },
+        {
+            "transcript_path": "140_jocko.txt",
+            "wav_path": "140_jocko.wav"
+        },
+        {
+            "transcript_path": "141_jocko.txt",
+            "wav_path": "141_jocko.wav"
+        },
+        {
+            "transcript_path": "142_jocko.txt",
+            "wav_path": "142_jocko.wav"
+        },
+        {
+            "transcript_path": "143_jocko.txt",
+            "wav_path": "143_jocko.wav"
+        },
+        {
+            "transcript_path": "144_jocko.txt",
+            "wav_path": "144_jocko.wav"
+        },
+        {
+            "transcript_path": "145_jocko.txt",
+            "wav_path": "145_jocko.wav"
+        },
+        {
+            "transcript_path": "146_jocko.txt",
+            "wav_path": "146_jocko.wav"
+        },
+        {
+            "transcript_path": "147_jocko.txt",
+            "wav_path": "147_jocko.wav"
+        },
+        {
+            "transcript_path": "148_jocko.txt",
+            "wav_path": "148_jocko.wav"
+        },
+        {
+            "transcript_path": "149_jocko.txt",
+            "wav_path": "149_jocko.wav"
+        },
+        {
+            "transcript_path": "150_jocko.txt",
+            "wav_path": "150_jocko.wav"
+        },
+        {
+            "transcript_path": "151_jocko.txt",
+            "wav_path": "151_jocko.wav"
+        },
+        {
+            "transcript_path": "152_jocko.txt",
+            "wav_path": "152_jocko.wav"
+        },
+        {
+            "transcript_path": "153_jocko.txt",
+            "wav_path": "153_jocko.wav"
+        },
+        {
+            "transcript_path": "154_jocko.txt",
+            "wav_path": "154_jocko.wav"
+        },
+        {
+            "transcript_path": "155_jocko.txt",
+            "wav_path": "155_jocko.wav"
+        },
+        {
+            "transcript_path": "156_jocko.txt",
+            "wav_path": "156_jocko.wav"
+        },
+        {
+            "transcript_path": "157_jocko.txt",
+            "wav_path": "157_jocko.wav"
+        },
+        {
+            "transcript_path": "158_jocko.txt",
+            "wav_path": "158_jocko.wav"
+        },
+        {
+            "transcript_path": "159_jocko.txt",
+            "wav_path": "159_jocko.wav"
+        },
+        {
+            "transcript_path": "160_jocko.txt",
+            "wav_path": "160_jocko.wav"
+        },
+        {
+            "transcript_path": "161_jocko.txt",
+            "wav_path": "161_jocko.wav"
+        },
+        {
+            "transcript_path": "162_jocko.txt",
+            "wav_path": "162_jocko.wav"
+        },
+        {
+            "transcript_path": "163_jocko.txt",
+            "wav_path": "163_jocko.wav"
+        },
+        {
+            "transcript_path": "164_jocko.txt",
+            "wav_path": "164_jocko.wav"
+        },
+        {
+            "transcript_path": "165_jocko.txt",
+            "wav_path": "165_jocko.wav"
+        },
+        {
+            "transcript_path": "166_jocko.txt",
+            "wav_path": "166_jocko.wav"
+        },
+        {
+            "transcript_path": "167_jocko.txt",
+            "wav_path": "167_jocko.wav"
+        },
+        {
+            "transcript_path": "168_jocko.txt",
+            "wav_path": "168_jocko.wav"
+        },
+        {
+            "transcript_path": "169_jocko.txt",
+            "wav_path": "169_jocko.wav"
+        },
+        {
+            "transcript_path": "170_jocko.txt",
+            "wav_path": "170_jocko.wav"
+        },
+        {
+            "transcript_path": "171_jocko.txt",
+            "wav_path": "171_jocko.wav"
+        },
+        {
+            "transcript_path": "172_jocko.txt",
+            "wav_path": "172_jocko.wav"
+        },
+        {
+            "transcript_path": "173_jocko.txt",
+            "wav_path": "173_jocko.wav"
+        },
+        {
+            "transcript_path": "174_jocko.txt",
+            "wav_path": "174_jocko.wav"
+        },
+        {
+            "transcript_path": "175_jocko.txt",
+            "wav_path": "175_jocko.wav"
+        },
+        {
+            "transcript_path": "176_jocko.txt",
+            "wav_path": "176_jocko.wav"
+        },
+        {
+            "transcript_path": "177_jocko.txt",
+            "wav_path": "177_jocko.wav"
+        },
+        {
+            "transcript_path": "178_jocko.txt",
+            "wav_path": "178_jocko.wav"
+        },
+        {
+            "transcript_path": "179_jocko.txt",
+            "wav_path": "179_jocko.wav"
+        },
+        {
+            "transcript_path": "180_jocko.txt",
+            "wav_path": "180_jocko.wav"
+        },
+        {
+            "transcript_path": "181_jocko.txt",
+            "wav_path": "181_jocko.wav"
+        },
+        {
+            "transcript_path": "182_jocko.txt",
+            "wav_path": "182_jocko.wav"
+        },
+        {
+            "transcript_path": "183_jocko.txt",
+            "wav_path": "183_jocko.wav"
+        },
+        {
+            "transcript_path": "184_jocko.txt",
+            "wav_path": "184_jocko.wav"
+        },
+        {
+            "transcript_path": "185_jocko.txt",
+            "wav_path": "185_jocko.wav"
+        },
+        {
+            "transcript_path": "186_jocko.txt",
+            "wav_path": "186_jocko.wav"
+        },
+        {
+            "transcript_path": "187_jocko.txt",
+            "wav_path": "187_jocko.wav"
+        },
+        {
+            "transcript_path": "188_jocko.txt",
+            "wav_path": "188_jocko.wav"
+        },
+        {
+            "transcript_path": "189_jocko.txt",
+            "wav_path": "189_jocko.wav"
+        },
+        {
+            "transcript_path": "190_jocko.txt",
+            "wav_path": "190_jocko.wav"
+        },
+        {
+            "transcript_path": "191_jocko.txt",
+            "wav_path": "191_jocko.wav"
+        },
+        {
+            "transcript_path": "192_jocko.txt",
+            "wav_path": "192_jocko.wav"
+        },
+        {
+            "transcript_path": "193_jocko.txt",
+            "wav_path": "193_jocko.wav"
+        }
+    ]
+}

@@ -1,5 +1,5 @@
 # [(W-K + 2P) / S] + 1
-img_size: [96, 128]
+img_size: [128, 96]
 generator:
   encoder:
     image_encoder:
@@ -27,7 +27,7 @@ generator:
   
   frame_decoder:
     stride: 2
-    kernel_size: [6,8]
+    kernel_size: [8,6]
     in_d: 768 # concatenated dimensions of audio, img & noise
     # Should be same as image_encoder hid_d
     hid_d: 64

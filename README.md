@@ -2,9 +2,38 @@
 ASR -> Transformer -> TTS -> Avatar
 Updates coming soon
 
-### Avatar
+# Overview
+- A series of neural networks that creates an AI companion
+- Motivation:
+    - I wanted to create an end 2 end deep learning product that can be used by consumers
+    - I wanted to implement a large range of different architectures and data pipelines
+    - I wanted to harvest and process my own data not just use prebuilt cleaned datasets
+    - Architectures used:
+        - Generative Adversarial data for 3D data (Realistic Avatar)
+        - Pytorch 3D ie: deep learning on meshs (Animated Avatar)
+        - Transformers: Text engine
+        - Automatic Speech Recognition
+        - Text to Speech engine 
 
-Animated Unity 3D pack animation kit for dataset creation
+### Avatar
+#### Real
+#### Animated
+    - Avatar head
+    - Wav file -> NN -> Series of facial anchor points
+    - Training:
+        - Dataset:
+            - Convert videos of target into mesh points frame by frame
+            - Use the locations as targets for each wav frame similar to the generator used in real avatar
+    - Starting anchor points of 2d image and 3d mesh
+    - At each frame calculate the transformation that occurs between the 2d points and then apply to 3d
+
+
+### TTS
+#### Data Pipeline
+- Speaker diarization:
+    - Hand labelled 50 samples of audio snippets from conversations
+    - Train audio classifier to distinguish clips 
+    - Train ASR model to predict text from speech
 
 
 ## - Status: Videos are generating, Requires ID frame and audio

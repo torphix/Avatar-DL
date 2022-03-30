@@ -98,3 +98,20 @@ def sample_frames(video, sample_size):
     selection_idx = torch.randperm(sample_size)
     real_frames = video[selection_idx, :, :, :]
     return real_frames
+
+
+def delete_long_clips(path, max_frames):
+    '''
+    path: video path eg: data/datasets/processed/lex
+    '''
+    for folder in os.listdir(f'{path}/VideoFlash'):
+        for file in os.listdir(f'{path}/VideoFlash/{folder}/'):
+            frames = VideoFileClip(f'{path}/VideoFlash/{folder}/{file}')
+            frames = [frame for frame in frames.iter_frames()]
+            if len(frames) > max_frames:
+                print('removing', file)
+                os.remove(f'{path}/VideoFlash/{folder}/{file}')
+                os.remove(f'{path}/AudioWAV/{folder}/{file.split(".")[0]}.wav')
+            
+            
+# delete_long_clips('/home/j/Desktop/Programming/AI/DeepLearning/la_solitudine/avatar/realistic/data/datasets/processed/lex', 150)

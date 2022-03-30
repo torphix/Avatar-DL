@@ -153,10 +153,12 @@ class LexDataHandler(object):
         movie_clips, audio_clips = remove_short_clips(movie_clips, audio_clips, fps, self.min_frame_len)
         movie_clips, audio_clips = remove_long_clips(movie_clips, audio_clips, fps, self.max_frame_len)
         # Crop uneven clips (do this in dataset)
-        # movie_clips, audio_clips = make_clips_even(movie_clips, audio_clips, fps, clip.audio.fps)
+        movie_clips, audio_clips = make_clips_even(movie_clips, audio_clips, fps, clip.audio.fps)
+        movie_clips, audio_clips = make_clips_even(movie_clips, audio_clips, fps, clip.audio.fps)
         assert len(audio_clips) == len(movie_clips),\
             f'Audio clips {len(audio_clips)}, Movie clips {len(movie_clips)} unequal'
         return movie_clips, audio_clips, fps
+        
         
     
     
@@ -193,17 +195,27 @@ def remove_long_clips(movie_clips, audio_clips, fps, max_len):
 
 
 def make_clips_even(movie_clips, audio_clips, fps, sr):
+    '''
+    Audio clips are list of audio segments 
+    can be sliced using ms
+    '''
     video_times = [clip.shape[0] / fps for clip in movie_clips]
-    audio_times = [audio.get_array_of_samples() / sr for audio in audio_clips]
+    audio_times = [audio.duration_seconds for audio in audio_clips]
     for i in range(len(audio_times)):
         # Video longer than audio
-        if video_times[i] - audio_times[i] > 0:
-            crop_to = video_times[i] - audio_times[i] * fps
-            movie_clips[i] = movie_clips[i][:-crop_to]
+        print(video_times[i], audio_times[i])
+        if video_times[i] > audio_times[i]:
+            crop_to = (video_times[i] * fps) - (audio_times[i] * fps)
+            crop_to = movie_clips[i].shape[0] - crop_to
+            print('Cropping, video size:', movie_clips[i].shape[0], 'to', crop_to)
+            movie_clips[i] = movie_clips[i][:int(crop_to)]
         # Audio longer than video
-        elif audio_times[i] - video_times[i] > 0:
-            crop_to = audio_times[i] - video_times[i] * sr
-            audio_clips[i] = audio_clips[i][:-crop_to]
+        elif audio_times[i] > video_times[i]:
+            # Convert to ms times and then crop, idxing works in ms for AudioSegment
+            crop_to = (audio_times[i] * 1000) - (video_times[i] * 1000)
+            crop_to = (audio_times[i] * 1000) - crop_to
+            print('Cropping, audio size:', audio_clips[i].duration_seconds * 1000, 'to', crop_to)
+            audio_clips[i] = audio_clips[i][:int(crop_to)]
         # assert (audio_clips[i].shape / sr) == movie_clips[i].shape / fps, \
         #     f'Clips are uneven check func. Audio: {audio_clips[i].shape}, Video: {movie_clips[i].shape}'
     return movie_clips, audio_clips

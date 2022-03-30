@@ -5,3 +5,5 @@ processed
 saved_models
 lightning_logs
 shape_predictor_68_face_landmarks.dat
+*.wav
+*.ckpt

@@ -8,6 +8,7 @@ if __name__ == '__main__':
     command = sys.argv[1]    
     parser = argparse.ArgumentParser()
 
+    # Realisitc Avatar Commands
     if command == 'create_realistic_avatar_dataset':
         parser.add_argument('-d', '--dataset', required=True,
                             help='Name of dataset, eg: "lex", "crema" ') 
@@ -23,6 +24,10 @@ if __name__ == '__main__':
     
     elif command == 'train_realistic_avatar':
         train()
+        
+        
+    # TTS commands
+    # elif command == 'tts_'
         
     else:
         print('''
