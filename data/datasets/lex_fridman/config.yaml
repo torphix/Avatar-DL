@@ -1,0 +1,50 @@
+silence_length_crop: 500 # in ms
+video_fps: 25
+max_frames: 4000 # num of frames to read from intro
+clip_min_len: 1000 # min clip len in ms
+clip_max_len: 5000 # in ms
+save_path: 'data/datasets/lex_fridman/raw'
+links: [
+  # Skips due to mic locality or other issues
+  # "https://www.youtube.com/watch?v=e4Bet29PVPY", # 207
+  # "https://www.youtube.com/watch?v=Z1KwkpTUbkg", # 208
+  # "https://www.youtube.com/watch?v=ndMahzDCH1Y", # 209
+  # "https://www.youtube.com/watch?v=Hc4XvHTlW3s", # 210
+  # "https://www.youtube.com/watch?v=oYQh1ZNkC70", # 211
+  # "https://www.youtube.com/watch?v=rIpUf-Vy2JA", # 212
+  # "https://www.youtube.com/watch?v=J48bm21q8_A", # 213
+  # "https://www.youtube.com/watch?v=TRdL6ZzWBS0", # 214
+  # "https://www.youtube.com/watch?v=U5OD8MjYnOM", # 215
+  # "https://www.youtube.com/watch?v=nre0QT9LN6w", # 217
+  # "https://www.youtube.com/watch?v=Fx0G6DHMfXM", # 218
+  # "https://www.youtube.com/watch?v=EE1R8FYUJm0", # 219
+  # "https://www.youtube.com/watch?v=hZenJc1fa70", # 220
+  # "https://www.youtube.com/watch?v=3wMKoSRbGVs", # 221
+  # "https://www.youtube.com/watch?v=uiNpESmPioQ", # 223
+  # "https://www.youtube.com/watch?v=cC1HszE5Hcw", # 227
+  # "https://www.youtube.com/watch?v=Iau6W5pjy9Y", # 228
+  # "https://www.youtube.com/watch?v=PbN3HzKkW4M", # 230
+  # "https://www.youtube.com/watch?v=kSbMU5CbFM0", # 231
+  # "https://www.youtube.com/watch?v=3LWNY70Oj4A", # 233
+  # "https://www.youtube.com/watch?v=80OvNaEgmmw", # 235
+  # "https://www.youtube.com/watch?v=uy1fX2vOAEE", # 236
+  # "https://www.youtube.com/watch?v=mRZE-SJShkE", # 238
+  # "https://www.youtube.com/watch?v=xF6x1ftN-H4", # 239
+  # "https://www.youtube.com/watch?v=xAfdSak2fs8", # 240
+  # "https://www.youtube.com/watch?v=U_AREIyd0Fc", # 241
+  # "https://www.youtube.com/watch?v=tApj7Q37P2k", # 242
+  # "https://www.youtube.com/watch?v=3pvpNKUPbIY", # 243
+  # "https://www.youtube.com/watch?v=CDiqA4SJNpA", # 244
+  # "https://www.youtube.com/watch?v=Ww6pfsWmkdY", # 245
+  # "https://www.youtube.com/watch?v=nDDJFvuFXdc", # 246
+    "https://www.youtube.com/watch?v=Vrz8YDl9CeA", # 248
+    "https://www.youtube.com/watch?v=Z_LhPMhkEdw", # 249
+    "https://www.youtube.com/watch?v=X0-SXS6zdEQ", # 250
+    "https://www.youtube.com/watch?v=TISMidxdZoc", # 251
+    "https://www.youtube.com/watch?v=3Z7WimACqG8", # 259
+    "https://www.youtube.com/watch?v=krB0enBeSiE", # 160
+    "https://www.youtube.com/watch?v=d2bYwYxqJCM", # 161
+    "https://www.youtube.com/watch?v=G4hL5Om4IJ4", # 162
+    "https://www.youtube.com/watch?v=ifX_JnBfxTY", # 163
+    "https://www.youtube.com/watch?v=-59zJzx64xA", # tell lex your story ukraine
+  ]

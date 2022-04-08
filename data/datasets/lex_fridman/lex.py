@@ -1,4 +1,5 @@
 import os
+from natsort import natsorted
 import numpy as np
 from tqdm import tqdm
 from pytube import YouTube
@@ -12,7 +13,8 @@ def create_lex_dataset(links,
                        video_fps,
                        max_frames,
                        min_frame_len,
-                       max_frame_len):
+                       max_frame_len,
+                       save_path):
     data_handler = LexDataHandler(
                         links,
                         silence_length_crop,
@@ -20,7 +22,7 @@ def create_lex_dataset(links,
                         max_frames,
                         min_frame_len,
                         max_frame_len,
-                        )
+                        save_path)
     data_handler.start()
     # align_dataset([f'{root_input}/{file}' for file in os.listdir(root_input)])    
     
@@ -33,6 +35,7 @@ class LexDataHandler(object):
                  max_frames,
                  min_frame_len,
                  max_frame_len,
+                 save_path,
                  ) -> None:
         '''
         links: Youtube links
@@ -47,6 +50,7 @@ class LexDataHandler(object):
         self.max_frames = max_frames
         self.min_frame_len = min_frame_len
         self.max_frame_len = max_frame_len
+        self.save_path = save_path
 
     def start(self):
         print('Starting youtube download')
@@ -62,7 +66,7 @@ class LexDataHandler(object):
     def save_audio_and_video(self, idx, f_name, clip, audio, fps):
         print('Saving video')
         abs_path = os.path.abspath('.')
-        lex_processed_data_path = 'avatar/realistic/data/datasets/processed/lex'
+        lex_processed_data_path = self.save_path
         os.makedirs(f'{abs_path}/{lex_processed_data_path}/VideoFlash/{f_name}', exist_ok=True)
         os.makedirs(f'{abs_path}/{lex_processed_data_path}/AudioWAV/{f_name}', exist_ok=True)
         video_root = f'{abs_path}/{lex_processed_data_path}/VideoFlash/{f_name}'
@@ -77,16 +81,16 @@ class LexDataHandler(object):
         yt = YouTube(link)
         new_title = yt.title.split(':')[0].replace(' ', '_').lower()
         abs_path = os.path.abspath('.')
-        raw_path = 'avatar/realistic/data/datasets/raw/lex'
+        raw_path = self.save_path
         new_path = f'{abs_path}/{raw_path}/{new_title}.mp4'
+        if os.path.exists(f'{raw_path}/download_log.txt') == False:
+            open(f'{raw_path}/download_log.txt', 'a').close()
         with open(f'{raw_path}/download_log.txt', 'r') as f:
             log = f.readlines()
             log = [name.strip('\n') for name in log]
-        if new_title in log: return new_path, new_title
-        else: 
+        if new_title not in log: 
             with open(f'{raw_path}/download_log.txt', 'a') as f:
                 f.write(f'\n{new_title}')
-        print(raw_path)
         yt.streams.get_by_itag(22).download(f'{raw_path}', f'{new_title}.mp4')
 
         print('Download Complete')
@@ -220,3 +224,32 @@ def make_clips_even(movie_clips, audio_clips, fps, sr):
         #     f'Clips are uneven check func. Audio: {audio_clips[i].shape}, Video: {movie_clips[i].shape}'
     return movie_clips, audio_clips
             
+            
+def equalize_folder(src_dir, target_dir):
+    '''Removes wavs of folder that are unequal'''
+    src_files = natsorted([file for file in os.listdir(src_dir)])
+    tgt_files = natsorted([file for file in os.listdir(target_dir)])[len(src_files):]
+    check_files = [file.split('/')[-1].split('.0') for file in src_files]
+    for tgt_f in tgt_files:
+        if tgt_f in check_files:
+            raise ValueError(tgt_f, 'in', check_files)
+        os.remove(f'{target_dir}/{tgt_f}')        
+        
+
+def get_dataset_length(input_dir):
+    times = []
+    for folder in tqdm(os.listdir(input_dir)):
+        for file in os.listdir(f'{input_dir}/{folder}'):
+            audio = AudioSegment.from_wav(f'{input_dir}/{folder}/{file}')
+            times.append(audio.duration_seconds)
+    print('Total time:', sum(times))
+        
+        
+# src_root = '/home/j/Desktop/Programming/AI/DeepLearning/la_solitudine/data/datasets/lex_fridman/raw/VideoFlash'
+# tgt_root = '/home/j/Desktop/Programming/AI/DeepLearning/la_solitudine/data/datasets/lex_fridman/raw/AudioWAV'
+# src = natsorted([folder for folder in os.listdir(src_root)])
+# tgts = natsorted([folder for folder in os.listdir(tgt_root)])
+
+# for i in range(len(src)):
+#     equalize_folder(f'{src_root}/{src[i]}', f'{tgt_root}/{tgts[i]}')
+    

@@ -1,4 +1,3 @@
-import enum
 import os
 from tqdm import tqdm
 from natsort import natsorted
@@ -30,7 +29,6 @@ def split_audio_from_video(input_file, fname):
     os.remove('tts/data/dataset/raw/tmp.wav')
     
 
-
 def split_audio_on_silence(audio, min_silence_len, fps):
     audio_clips = silence.split_on_silence(
         audio,
@@ -46,6 +44,3 @@ def reindex_files():
     s_files = natsorted(os.listdir(root))    
     for i, f in enumerate(s_files):
         os.rename(f'{root}/{f}', f'{root}/{i+1}_{f.split("_")[1]}.wav')
-        
-reindex_files()
-# preprocess_video()

@@ -9,5 +9,6 @@ accelerator: "gpu"
 gradient_clip_val: .5
 gradient_clip_algorithm: "value"
 accumulate_grad_batches: 4
+# Provide one or the other
 checkpoint_path: # "/home/j/Desktop/Programming/AI/DeepLearning/speech_clone/tb_logs/fs2/version_9/checkpoints/epoch=77-step=62633.ckpt"
 model_dir: /home/j/Desktop/Programming/AI/DeepLearning/la_solitudine/avatar/realistic/saved_models/501
