@@ -1,20 +1,21 @@
 import os
 from .asr import ASR
 from tqdm import tqdm
+from .utils import SpellingCorrector
 
-def folders_in(path_to_parent):
-    for fname in os.listdir(path_to_parent):
-        if os.path.isdir(os.path.join(path_to_parent,fname)):
-            yield os.path.join(path_to_parent,fname)
 
-def transcribe_folder(input_dir, output_dir, batch_size):
-    print('Transcribing folder & subfolders...')
+def transcribe_subfolders(input_dir, output_dir):
+    for folder in os.listdir(input_dir):
+        transcribe_folder(f'{input_dir}/{folder}', f'{output_dir}/{folder}')
+
+def transcribe_folder(input_dir, output_dir):
     asr = ASR()
-    if len(list(folders_in(input_dir))) > 0:
-        for folder in os.listdir(input_dir):
-            asr.folder_inference(f'{input_dir}/{folder}', f'{output_dir}/{folder}', batch_size)
-    else:
-        asr.folder_inference(f'{input_dir}/{folder}', output_dir, batch_size)
-    print('Done')
-        
-        
+    for file in os.listdir(input_dir):
+        asr.file_inference(f'{input_dir}/{file}', 
+                           f'{output_dir}/{file.split(".")[0]}.txt')
+    
+def correct_spelling(input_dir, additional_vocab=''):
+    corrector = SpellingCorrector(additional_vocab)
+    for folder in tqdm(os.listdir(input_dir)):
+        corrector.correct_folder(f'{input_dir}/{folder}')
+    

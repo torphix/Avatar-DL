@@ -39,7 +39,6 @@ class YTTTSDatasetCreator(object):
             if caption is None:
                 return 
         captions = caption.generate_srt_captions()
-        print(captions)
         captions = captions.split('\n\n')
         # Split audio
         audio = AudioSegment.from_file(f'{raw_path}/{new_title}.mp3')

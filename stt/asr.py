@@ -1,14 +1,13 @@
 import os
 import json
-from natsort import natsorted
 import torch
-import soundfile
+import librosa
 from tqdm import tqdm
 from random import shuffle
 import scipy.signal as sps
 import torch.optim as optim
+from natsort import natsorted
 import torch.nn.functional as F
-from spellchecker import SpellChecker
 from transformers import Wav2Vec2ForCTC, Wav2Vec2Processor
 
 
@@ -17,8 +16,6 @@ class ASR:
                  model_dict=None,
                  processor="facebook/wav2vec2-base-960h",
                  root_path="/home/j/Desktop/Programming/AI/DeepLearning/la_solitudine/stt",
-                 spell_check=True,
-                 spell_check_custom='',
                  device=None):
         super().__init__()
         
@@ -31,14 +28,10 @@ class ASR:
         self.model = self.model.to(self.device)
         if model_dict is not None:
             self.model.load_state_dict(torch.load(model_dict))
-        if spell_check:
-            self.spell = SpellChecker()
-            if spell_check_custom != '':
-                self.spell.word_frequency.load_text_file(
-                                spell_check_custom)
+
             
     def load_audio(self, path, target_sr):
-        audio, current_sr = soundfile.read(path)
+        audio, current_sr = librosa.load(path)
         number_of_samples = round(audio.shape[0] * float(target_sr) / current_sr)
         audio_input = sps.resample(audio, number_of_samples)        
         return audio_input
@@ -113,8 +106,6 @@ class ASR:
         predicted_ids = torch.argmax(logits, dim=-1)
         # transcribe
         transcription = self.processor.decode(predicted_ids[0])
-        if self.spell:
-            transcription = [self.spell.correction(word) for word in transcription]
         output_dir = "/".join(output_path.split("/")[:-1])
         os.makedirs(output_dir, exist_ok=True)
         if output_path is not None:
@@ -137,6 +128,7 @@ class ASR:
                 transcriptions = [self.processor.decode(ids) for ids in predicted_ids]
                 outputs.append(transcriptions)
                 inputs = []    
+                print(outputs)
         if output_dir is not None:
             os.makedirs(output_dir, exist_ok=True)
             for i, t in enumerate(transcriptions):

@@ -25,5 +25,8 @@ Uses a finetuned transformer as I will never get as good results training from s
 2. Train Language model on the Auto generated transcripts
 3. Use ASR to transcribe the dataset
 4. Finetune the TTS model
+    - Normalize wav
+    - .wav .lab format
+    - Get alignments
 5. Generate audio from text to train the generator (after pretraining on real audio)
 6. Build end to end streaming pipeline
