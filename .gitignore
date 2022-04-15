@@ -11,3 +11,10 @@ jocko_willink
 PortaSpeech
 animated
 Text
+venv
+.ipynb_checkpoints
+finetuned_models
+hifi-gan
+*.onnx
+# Javascript
+node_modules

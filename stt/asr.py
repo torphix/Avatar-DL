@@ -28,7 +28,6 @@ class ASR:
         self.model = self.model.to(self.device)
         if model_dict is not None:
             self.model.load_state_dict(torch.load(model_dict))
-
             
     def load_audio(self, path, target_sr):
         audio, current_sr = librosa.load(path)
