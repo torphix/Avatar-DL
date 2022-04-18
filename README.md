@@ -1,9 +1,9 @@
 # Summary
 Creation of digital avatars that you can conversate with consisting of:
-    - Generative adversarial networks for video generation (custom built)
-    - ASR system (Finetuned)
-    - TTS system (Finetuned)
-    - Transformer Text Engine (Finetuned)
+- Generative adversarial networks for video generation (custom built)
+- ASR system (Finetuned)
+- TTS system (Finetuned)
+- Transformer Text Engine (Finetuned)
 
 Future directions:
     - Upload an ID, Speech clip & Train on custom text data
