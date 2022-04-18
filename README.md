@@ -19,23 +19,23 @@ Uses the finetuned style gan modified to work with videos
 ### Transformer Text Engine 
 Uses a finetuned transformer as I will never get as good results training from scratch
 
-## Data pipeline
-1. Scrape video and audio pairs from youtube / other sources
-2. Train Language model on the Auto generated transcripts
-3. Use ASR to transcribe the dataset
-4. Finetune the TTS model
-    - Normalize wav
-    - .wav .lab format
-    - Get alignments
-5. Generate audio from text to train the generator (after pretraining on real audio)
-6. Build end to end streaming pipeline
+## Data pipeline / Summary of steps
+1. Scrape video from youtube 
+2. Clean dataset filter out too long / too short etc
+3. Seperate speakers by clustering speaker embeddings and selecting for desired cluster
+4. Transcribe remaining audio files
+5. Manually fix transcriptions
+6. Fine tune ASR model on fixed transcriptions and updated lexicon
+7. Transcribe remaining files
+8. Fine tune TTS model on text audio pairs
+9. Generate SDA dataset text-audio (synthetic)-video pairs
+10. Align face in center and get mouth landmarks
+10. Train SDA model, reconstruction loss should be around mouth landmarks 
+11. Fine tune LM on subject text
+12. Build end to end streaming inference system
 
-
-## Audio Classifier
-1. To seperate out the speakers in audio I trained an audio classifer
-2. Bubbled up the incorrectly classified wav files and listened to them
-3. Found that the model was struggling when there was large amounts of silence at the start (I was cropping the wav files so mainly silence)
-4. Add trim silence to data preprocessing pipeline
+## Lessons learnt
+1. Bubble up any misclassified elements and fine tune on errors in dataset
 
 ## TTS
 1. Finetune mel decoder with generated spectorgrams for better results
@@ -63,3 +63,6 @@ Uses a finetuned transformer as I will never get as good results training from s
 <!-- Add Tensorboard to SDA -->
 
 Once done email gdb@openai.com 
+
+
+441

@@ -30,7 +30,8 @@ def connect(auth):
 def process_audio(audio_chunk):
     AVATAR.write_audio(audio_chunk)
     if AVATAR.output_queue.qsize() > 0:
-        emit
+        emit('response', {'data': AVATAR.output_queue.get()})
+        
 if __name__ == '__main__':
     socketio.run(app)
 

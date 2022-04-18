@@ -4,14 +4,14 @@ import torch
 import torch.nn as nn
 import numpy as np
 
-from utils.tools import get_mask_from_lengths, pad, word_level_pooling
+from .utils import get_mask_from_lengths, pad, word_level_pooling
 
 from .blocks import (
     ConvNorm,
     RelativeFFTBlock,
     WordToPhonemeAttention,
 )
-from text.symbols import symbols
+from ..text.symbols import symbols
 
 
 def get_sinusoid_encoding_table(n_position, d_hid, padding_idx=None):

@@ -5,8 +5,8 @@ import torch
 import numpy as np
 from g2p_en import G2p
 from string import punctuation
-from text import text_to_sequence
-from model.PortaSpeech import PortaSpeech
+from .text import text_to_sequence
+from .model.PortaSpeech import PortaSpeech
 
 def read_lexicon(lex_path):
     lexicon = {}

@@ -1,6 +1,6 @@
-from utils import *
+from .utils import *
 import torch.nn as nn
-from vocoder.vocoder import get_vocoder
+from .vocoder.vocoder import get_vocoder
 
 
 class TTS(nn.Module):

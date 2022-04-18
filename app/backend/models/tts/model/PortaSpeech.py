@@ -4,7 +4,7 @@
 import torch
 import torch.nn as nn
 
-from utils.tools import get_mask_from_lengths
+from .utils import get_mask_from_lengths
 from .linguistic_encoder import LinguisticEncoder
 from .variational_generator import VariationalGenerator
 from .postnet import FlowPostNet

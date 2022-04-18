@@ -1,6 +1,6 @@
 import json
 import torch
-from models import Generator
+from .models import Generator
 
 
 class AttrDict(dict):

@@ -11,10 +11,10 @@ How it works:
 import io
 import time
 import multiprocessing
-from asr import LiveASR
+from .asr import LiveASR
 from queue import  Queue
-from tts.tts import TTS
-from text_engine import TextEngine
+from .tts.tts import TTS
+from .text_engine import TextEngine
 from multiprocessing import Process
 
 

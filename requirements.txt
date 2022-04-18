@@ -1,0 +1,6 @@
+https://github.com/pyannote/pyannote-audio/archive/develop.zip
+moviepy
+pyyaml
+pydub
+natsort
+pytube

@@ -4,7 +4,7 @@ import torch
 import torch.nn as nn
 import numpy as np
 
-from utils.tools import get_mask_from_lengths, pad, reparameterize
+from .utils import get_mask_from_lengths, pad, reparameterize
 
 from .blocks import (
     Flip,
