@@ -16,5 +16,6 @@ venv
 finetuned_models
 hifi-gan
 *.onnx
+*.tar
 # Javascript
 node_modules

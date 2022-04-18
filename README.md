@@ -20,19 +20,16 @@ Uses the finetuned style gan modified to work with videos
 Uses a finetuned transformer as I will never get as good results training from scratch
 
 ## Data pipeline / Summary of steps
-1. Scrape video from youtube 
-2. Clean dataset filter out too long / too short etc
-3. Seperate speakers by clustering speaker embeddings and selecting for desired cluster
-4. Transcribe remaining audio files
-5. Manually fix transcriptions
-6. Fine tune ASR model on fixed transcriptions and updated lexicon
-7. Transcribe remaining files
-8. Fine tune TTS model on text audio pairs
-9. Generate SDA dataset text-audio (synthetic)-video pairs
-10. Align face in center and get mouth landmarks
-10. Train SDA model, reconstruction loss should be around mouth landmarks 
-11. Fine tune LM on subject text
-12. Build end to end streaming inference system
+1. Scrape youtube video
+2. Speaker diarization to locate and extract target speaker
+3. Clip video into short clips (1-8 seconds)
+4. Transcribe each clip
+5. Fine tune ASR model 
+6. Fine tune TTS model
+7. Generate SDA dataset using synthetic wav forms
+8. Train SDA
+9. Construct end to end inference pipeline
+
 
 ## Lessons learnt
 1. Bubble up any misclassified elements and fine tune on errors in dataset
@@ -64,5 +61,3 @@ Uses a finetuned transformer as I will never get as good results training from s
 
 Once done email gdb@openai.com 
 
-
-441
