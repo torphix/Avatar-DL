@@ -104,6 +104,13 @@ class LexDataHandler(object):
         new_title = yt.title.split(':')[0].replace(' ', '_').lower()
         raw_path = self.save_path
         new_path = f'{raw_path}/{new_title}.mp4'
+        # Check if multiple videos exist
+        if os.path.exists(new_path):
+            new_idx = 0
+            for path in os.listdir(raw_path):
+                if new_title in path: new_idx += 1
+            new_path = f'{raw_path}/{new_title}_{new_idx}.mp4'
+            new_title = f'{new_title}_{new_idx}'
         if os.path.exists(f'{raw_path}/download_log.txt') == False:
             open(f'{raw_path}/download_log.txt', 'a').close()
         with open(f'{raw_path}/download_log.txt', 'r') as f:

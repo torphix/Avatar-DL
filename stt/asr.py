@@ -1,14 +1,21 @@
+import re
 import os
 import json
 import torch
 import librosa
+import numpy as np
 from tqdm import tqdm
 from random import shuffle
 import scipy.signal as sps
 import torch.optim as optim
 from natsort import natsorted
 import torch.nn.functional as F
-from transformers import Wav2Vec2ForCTC, Wav2Vec2Processor
+from transformers import (Wav2Vec2ForCTC,
+                          Wav2Vec2Processor,
+                          Wav2Vec2CTCTokenizer,
+                          Wav2Vec2FeatureExtractor)
+
+from stt.data import DataCollatorCTCWithPadding
 
 
 class ASR:
@@ -39,61 +46,7 @@ class ASR:
         max_len = max([v.shape[0] for v in batch_list])
         batch_list = [F.pad(v, (0, int(max_len-v.shape[0]))) for v in batch_list]
         return torch.stack(batch_list)
-    
-    def finetune(self, 
-                 json_path,
-                 batch_size,
-                 target_sample_rate,
-                 save_path,
-                 epochs):
-        '''
-        example json_path
-        {
-            'id':{
-                'filepath': '*.wav',
-                'length': 4000,
-                'words': HELLO THERE HOW ARE YOU,
-                'speaker_id': 'lex',
-            }
-        }
-        '''
-        optimizer = optim.SGD(self.model.parameters(), lr=1e-5, momentum=0.9)
-        
-        with open(json_path, 'r') as f:
-            data = json.loads(f.read())
-            data = list(data.values())
             
-        shuffle(data)
-        inputs, targets = [], []
-        for e in tqdm(range(epochs)):
-            for i, datapoint in enumerate(data):
-                # Load & Resample audio
-                audio = self.load_audio(f"{self.root_path}/{datapoint['file_path']}", 
-                                        target_sample_rate)
-                inputs.append(audio)
-                targets.append(datapoint['words'])
-                if i % batch_size == 0:
-                    inputs = self.processor(inputs, 
-                                            sampling_rate=target_sample_rate,
-                                            return_tensors="pt",
-                                            padding=True).input_values
-                    inputs = inputs.to(self.device)
-                    with self.processor.as_target_processor():
-                        targets = self.processor(targets,
-                                                return_tensors='pt',
-                                                padding=True).input_ids
-                        targets = targets.to(self.device)
-                        print(targets)
-                    # Train loop
-                    optimizer.zero_grad()        
-                    loss = self.model(inputs, labels=targets).loss
-                    loss.backward()
-                    optimizer.step()
-                    targets, inputs = [], []
-                    
-            print(f'Epoch Loss is: {loss}')
-        torch.save(self.model.state_dict(), save_path)
-        
     def file_inference(self, input_path, output_path=None, sr=16000):     
         audio = self.load_audio(input_path, sr)   
         input_values = self.processor(audio, 
@@ -135,4 +88,105 @@ class ASR:
                 with open(f'{output_dir}/{f_name}.txt', 'w+') as f:
                     f.write(f'{t}\n') 
         return outputs
+    
+    def text_cleaner(self, text):
+        chars_to_ignore_regex = '[\,\?\.\!\-\;\:\"]'
+        return re.sub(chars_to_ignore_regex, '', text).lower()
+    
+    def get_vocab(self, input_dir):
+        print('Building Vocabulary...')
+        vocab = set()
+        for file in tqdm(os.listdir(input_dir)):
+            if '.txt' in file or '.lab' in file:
+                with open(f'{input_dir}/{file}') as f:
+                    text = f.read().strip("\n")
+                vocab = vocab | set([char for char in text])
+            else: 
+                continue
+        vocab = {v:k for v, k in enumerate(vocab)}
+        vocab["|"] = vocab[" "]
+        del vocab[" "]
+        vocab["[UNK]"] = len(vocab)
+        vocab["[PAD]"] = len(vocab)
+        print(f'Found vocab: {vocab}')
+        with open(f'{input_dir}/vocab.json', 'w') as vocab_f:
+            json.dump(vocab, vocab_f)
+        return vocab
+    
+    def finetune(self, 
+                 input_dir,
+                 batch_size,
+                 target_sample_rate,
+                 save_path,
+                 epochs):
+        '''
+        Input dir: *.wav & *.lab audio, text files
+        '''
+        vocab = self.get_vocab(input_dir)
+        tokenizer = Wav2Vec2CTCTokenizer(f"{input_dir}/vocab.json", 
+                                         unk_token="[UNK]",
+                                         pad_token="[PAD]",
+                                         word_delimiter_token="|")
+        feature_extractor = Wav2Vec2FeatureExtractor(feature_size=1,
+                                                     sampling_rate=16000,
+                                                     padding_value=0.0,
+                                                     do_normalize=True,
+                                                     return_attention_mask=False)
+        self.processor = Wav2Vec2Processor(feature_extractor=feature_extractor,
+                                      tokenizer=tokenizer)
+        collator = DataCollatorCTCWithPadding(processor=self.processor, padding=True)
+        self.model =model = Wav2Vec2ForCTC.from_pretrained(
+                                            "facebook/wav2vec2-base", 
+                                            ctc_loss_reduction="mean", 
+                                            pad_token_id=self.processor.tokenizer.pad_token_id)
+        optimizer = optim.SGD(self.model.parameters(), lr=1e-5, momentum=0.9)
+        
+        # Load batch
+        
+        shuffle(data)
+        inputs, targets = [], []
+        self.model.freeze_feature_extractor()
+        for e in tqdm(range(epochs)):
+            for i, datapoint in enumerate(data):
+                # Load & Resample audio
+                audio = self.load_audio(f"{self.root_path}/{datapoint['file_path']}", 
+                                        target_sample_rate)
+                inputs.append(audio)
+                targets.append(datapoint['words'])
+                if i % batch_size == 0:
+                    inputs = self.processor(inputs, 
+                                            sampling_rate=target_sample_rate,
+                                            return_tensors="pt",
+                                            padding=True).input_values
+                    inputs = inputs.to(self.device)
+                    with self.processor.as_target_processor():
+                        targets = self.processor(targets,
+                                                 return_tensors='pt',
+                                                 padding=True).input_ids
+                        targets = targets.to(self.device)
+                        print(targets)
+                    # Train loop
+                    optimizer.zero_grad()        
+                    loss = self.model(inputs, labels=targets).loss
+                    loss.backward()
+                    optimizer.step()
+                    targets, inputs = [], []
+                    
+            print(f'Epoch Loss is: {loss}')
+        torch.save(self.model.state_dict(), save_path)
+        
+    def compute_metrics(self, pred):
+        wer_metric = load_metric("wer")
+        pred_logits = pred.predictions
+        pred_ids = np.argmax(pred_logits, axis=-1)
+
+        pred.label_ids[pred.label_ids == -100] = self.processor.tokenizer.pad_token_id
+
+        pred_str = self.processor.batch_decode(pred_ids)
+        # we do not want to group tokens when computing the metrics
+        label_str = self.processor.batch_decode(pred.label_ids, group_tokens=False)
+
+        wer = wer_metric.compute(predictions=pred_str, references=label_str)
+
+        return {"wer": wer}
     

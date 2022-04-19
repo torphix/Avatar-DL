@@ -38,9 +38,3 @@ def split_audio_on_silence(audio, min_silence_len, fps):
         seek_step=1000) # should be equivalent to 1 video frame)
     return audio_clips
 
-
-def reindex_files():
-    root = '/home/j/Desktop/Programming/AI/DeepLearning/la_solitudine/tts/data/dataset/raw/jocko_willink/audio'
-    s_files = natsorted(os.listdir(root))    
-    for i, f in enumerate(s_files):
-        os.rename(f'{root}/{f}', f'{root}/{i+1}_{f.split("_")[1]}.wav')

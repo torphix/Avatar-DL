@@ -1,4 +1,5 @@
 # Summary
+! Work in Progress !
 Creation of digital avatars that you can conversate with consisting of:
 - Generative adversarial networks for video generation (custom built)
 - ASR system (Finetuned)
@@ -21,6 +22,7 @@ Uses a finetuned transformer as I will never get as good results training from s
 
 ## Data pipeline / Summary of steps
 1. Scrape youtube video
+    python3 main.py create_dataset --dataset {datasetname}
 2. Speaker diarization to locate and extract target speaker
 3. Clip video into short clips (1-8 seconds)
 4. Transcribe each clip

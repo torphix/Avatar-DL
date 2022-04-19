@@ -1,11 +1,12 @@
 import os
 import sys
 import argparse
-from natsort import natsorted
 from tqdm import tqdm
+from natsort import natsorted
 from data.create import create_dataset
 from data.filter import SeperateSpeakers
 from stt.main import transcribe_subfolders
+from stt.main import finetune as asr_finetune
 from data.datasets.lex_fridman.lex import get_dataset_length
 from avatar.realistic.train import train as realistic_avatar_train
 
@@ -61,8 +62,19 @@ if __name__ == '__main__':
                             help='Output dir will mimic inputs dirs file structure')
         parser.add_argument('-bs', '--batch_size', default=8)
         args, leftover_args = parser.parse_known_args()
-        transcribe_subfolders(args.input_dir, args.output_dir)        
+        transcribe_subfolders(args.input_dir, args.output_dir)   
         
+    elif command == 'asr_finetune':
+        parser.add_argument('-i', '--input_dir', required=True,
+                            help='Input dir') 
+        parser.add_argument('-o', '--output_dir', required=True,
+                            help='Output dir will mimic inputs dirs file structure')
+        parser.add_argument('-d', '--device', required=True,
+                            help='Device to fine tune on')        
+        args, leftover_args = parser.parse_known_args()
+        asr_finetune(args.input_dir, args.output_dir, args.device)
+            
+            
     elif command == 'format_audio_text_dirs_for_tts':
         parser.add_argument('-a', '--audio_dir', required=True,
                             help='Input dir') 
