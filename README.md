@@ -26,12 +26,15 @@ Uses a finetuned transformer as I will never get as good results training from s
 2. Speaker diarization to locate and extract target speaker
 3. Clip video into short clips (1-8 seconds)
 4. Transcribe each clip
+    - Manually correct some transcriptions
 5. Fine tune ASR model 
+    - Round two of transcribing
+5. Iterate over transcriptions and fine any OOV words
+6. Correct & replace OOV words
 6. Fine tune TTS model
 7. Generate SDA dataset using synthetic wav forms
 8. Train SDA
 9. Construct end to end inference pipeline
-
 
 ## Lessons learnt
 1. Bubble up any misclassified elements and fine tune on errors in dataset
@@ -63,3 +66,9 @@ Uses a finetuned transformer as I will never get as good results training from s
 
 Once done email gdb@openai.com 
 
+
+<!-- Code maintenance hygine etc -->
+1. Delete all legacy code
+2. Pass args from cmd line instead of kwargs each time to each functions, unclutters code
+3. Standardize
+4. Follow the standard as layed out by asr_finetune

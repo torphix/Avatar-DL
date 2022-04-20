@@ -1,14 +1,26 @@
 import os
 import sys
+import yaml
 import argparse
 from tqdm import tqdm
 from natsort import natsorted
 from data.create import create_dataset
 from data.filter import SeperateSpeakers
-from stt.main import transcribe_subfolders
-from stt.main import finetune as asr_finetune
+from stt.main import asr_finetune, asr_inference, find_oov
 from data.datasets.lex_fridman.lex import get_dataset_length
 from avatar.realistic.train import train as realistic_avatar_train
+
+def update_config_with_args(config_path, args):
+    with open(config_path, 'r') as f:
+        config = yaml.load(f.read(), Loader=yaml.FullLoader)
+    for key, value in vars(args).items():
+        if value is None: continue
+        try:
+            config[key] = value 
+        except:
+            raise Exception(f'Arg value:{key} not found in config') 
+    return config
+
 
 if __name__ == '__main__':
     command = sys.argv[1]    
@@ -55,26 +67,45 @@ if __name__ == '__main__':
         realistic_avatar_train()
         
     # ASR commands
-    elif command == 'transcribe_folder':
-        parser.add_argument('-i', '--input_dir', required=True,
-                            help='Input dir') 
-        parser.add_argument('-o', '--output_dir', required=True,
-                            help='Output dir will mimic inputs dirs file structure')
-        parser.add_argument('-bs', '--batch_size', default=8)
-        args, leftover_args = parser.parse_known_args()
-        transcribe_subfolders(args.input_dir, args.output_dir)   
-        
+    elif command == 'asr_inference':
+        parser.add_argument('-d', '--device')
+        parser.add_argument('-mpn', '--model_path_or_name',
+                            help='Disk location of saved model or name of hugging face repo')
+        parser.add_argument('-i', '--input_dir',
+                            help='Path to dataset, will recusivly search folders for wav files')
+        parser.add_argument('-o', '--output_dir',
+                            help='Output path, mimics input path structure')
+        parser.add_argument('-cp', '--config_path', default='stt/config/inference.yaml',
+                            help='Output path, mimics input path structure')
+        args, leftover_args = parser.parse_known_args()  
+        config_path = args.config_path
+        del args.config_path
+        config = update_config_with_args(config_path, args)
+        asr_inference(config)
+            
     elif command == 'asr_finetune':
+        parser.add_argument('-o', '--output_dir',
+                            help='Location where finetuned model is saved to')
+        parser.add_argument('-mpn', '--model_path_or_name',
+                            help='Disk location of saved model or name of hugging face repo')
+        parser.add_argument('-cp', '--config_path', default='stt/config/inference.yaml',
+                            help='Output path, mimics input path structure')
+        args, leftover_args = parser.parse_known_args()  
+        config_path = args.config_path
+        del args.config_path
+        config = update_config_with_args(config_path, args)
+        asr_finetune(config)
+        
+    elif command == 'find_oov':
         parser.add_argument('-i', '--input_dir', required=True,
-                            help='Input dir') 
-        parser.add_argument('-o', '--output_dir', required=True,
-                            help='Output dir will mimic inputs dirs file structure')
-        parser.add_argument('-d', '--device', required=True,
-                            help='Device to fine tune on')        
-        args, leftover_args = parser.parse_known_args()
-        asr_finetune(args.input_dir, args.output_dir, args.device)
-            
-            
+                            help='Input directory')
+        parser.add_argument('-o', '--output_file', required=True,
+                            help="Where the OOVs are written to")
+        parser.add_argument('-l', '--lexicon', required=True,
+                            help='Path to lexicon, should be in format WORD \t PHONEMES')
+        args, leftover_args = parser.parse_known_args()  
+        find_oov(args)
+        
     elif command == 'format_audio_text_dirs_for_tts':
         parser.add_argument('-a', '--audio_dir', required=True,
                             help='Input dir') 
@@ -91,7 +122,6 @@ if __name__ == '__main__':
                     text = f.read().strip("\n")
                 output_f.write(f'{audio.split(".")[0]}|{text}\n')
                 
-        
     elif command == 'get_dataset_length':
         parser.add_argument('-i', '--input_dir', required=True,
                             help='Input dir') 

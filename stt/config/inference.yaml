@@ -1,0 +1,7 @@
+device: 'cuda:0'
+batch_size: 8
+model_path_or_name: "stt/models/finetuned/asr.pth"
+input_dir: "data/datasets/lex_fridman/raw/AudioWAV"
+output_dir: "data/datasets/lex_fridman/raw/Text"
+auto_correct: False
+language_model_path:

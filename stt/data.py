@@ -22,7 +22,7 @@ class ASRDataset(Dataset):
     
     def __getitem__(self, index):   
         wav, txt = self.wavs[index], self.texts[index]
-        wav, sr = librosa.load(wav, 16000, mono=True)
+        wav, sr = librosa.load(wav, sr=16000, mono=True)
         wav = self.processor(wav, sampling_rate=sr).input_values[0]
         with open(txt, 'r') as f:
             txt = f.read().strip('\n')

@@ -1,23 +1,16 @@
-import os
-from .asr import ASR
-from tqdm import tqdm
+from stt.utils import search_for_oov
+from .asr import ASRInference
 from .finetune import ASRFinetune
 
-
-def transcribe_subfolders(input_dir, output_dir):
-    asr = ASR()
-    for folder in tqdm(os.listdir(input_dir)):
-        for file in tqdm(os.listdir(f'{input_dir}/{folder}')):
-            asr.file_inference(f'{input_dir}/{folder}/{file}', 
-                               f'{output_dir}/{folder}/{file.split(".")[0]}.txt')
-
-def transcribe_folder(input_dir, output_dir):
-    asr = ASR()
-    for file in tqdm(os.listdir(input_dir)):
-        asr.file_inference(f'{input_dir}/{file}', 
-                           f'{output_dir}/{file.split(".")[0]}.txt')
+def asr_inference(config):
+    asr = ASRInference(config)
+    asr.transcribe()
     
-
-def finetune(input_dir, output_dir, device):
-    asr = ASRFinetune(input_dir, output_dir, device)
+def asr_finetune(config):
+    asr = ASRFinetune(config)
     asr.finetune()
+
+def find_oov(args):
+    search_for_oov(args.input_dir, 
+                   args.output_file,
+                   args.lexicon_file)

@@ -17,5 +17,7 @@ finetuned_models
 hifi-gan
 *.onnx
 *.tar
+*.bin
+*.pt
 # Javascript
 node_modules

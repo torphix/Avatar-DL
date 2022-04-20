@@ -1,0 +1,45 @@
+device: 'cuda:0'
+output_dir: stt/models/finetuned/asr.pth
+model_path_or_name: "jonatasgrosman/wav2vec2-large-xlsr-53-english"
+datapath: "stt/data/datasets/processed/dataset.json"
+data_split: [0.95, 0.05]
+tokens: []
+training_args:
+    overwrite_output_dir: True
+    ignore_pretrained_weights: False
+    dataloader_num_workers: 2
+    learning_rate: 3.0e-4
+    min_learning_rate: 0.0
+    weight_decay: 0.0
+    adam_beta1: 0.9
+    adam_beta2: 0.999
+    adam_epsilon: 1.0e-8
+    max_grad_norm: 1.0
+    lr_warmup_steps: 0
+    lr_decay_steps: 0
+    eval_steps: 
+    group_by_length: True
+    length_column_name: "length"
+    gradient_accumulation_steps: 1
+    gradient_checkpointing: True
+    pad_to_multiple_of: 
+    per_device_train_batch_size: 8
+    per_device_eval_batch_size: 8
+    fp16: True
+    use_8bit_optimizer: False
+    logging_steps: 150
+    num_train_epochs: 20
+    max_steps: 0
+    report_to: []
+    save_total_limit: 
+    metric_for_best_model: 
+    _n_gpu: 1
+    seed: 42
+    training_step_callbacks: []
+    batch_creation_callbacks: []
+    evaluation_callbacks: []
+    metrics_batch_size: 
+    show_dataset_stats: True
+    early_stopping_patience: 
+    load_best_model_at_end: False
+
