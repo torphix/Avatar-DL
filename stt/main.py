@@ -1,4 +1,4 @@
-from stt.utils import search_for_oov
+from stt.utils import auto_correct_oov, search_for_oov
 from .asr import ASRInference
 from .finetune import ASRFinetune
 
@@ -13,4 +13,7 @@ def asr_finetune(config):
 def find_oov(args):
     search_for_oov(args.input_dir, 
                    args.output_file,
-                   args.lexicon_file)
+                   args.lexicon)
+    
+def correct_oovs(args):
+    auto_correct_oov(args.oov_file)
