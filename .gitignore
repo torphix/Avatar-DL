@@ -19,5 +19,7 @@ hifi-gan
 *.tar
 *.bin
 *.pt
+streamlit_venv
+language_models
 # Javascript
 node_modules

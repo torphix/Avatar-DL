@@ -1,6 +1,8 @@
 import re
 import os
 import sys
+import json
+import shutil
 import argparse
 import streamlit as st
 from natsort import natsorted
@@ -39,7 +41,6 @@ def load_before():
     st.session_state['index'] -= 1
     
 def skip_to_func():
-    print(st.session_state.skip_to)
     st.session_state['index'] = int(st.session_state.skip_to)
     
 def delete():
@@ -80,5 +81,20 @@ st.text(f_name)
 st.text(folder_name)
 st.text(f'{st.session_state["index"]}/{len(f_names)}')
 
-
+def copy_corrected():
+    export_files = f_names[int(st.session_state['copy_start_i']): int(st.session_state['copy_end_i'])]
+    datapoints = []
+    for file in export_files:
+        folder_name = "_".join(file.split("_")[1:])
+        with open(f'{TEXT_DIR}/{folder_name}/{file}.txt', 'r') as f:
+            text = f.read()
+            datapoints.append(
+                {'transcription':text, 'path':f'{AUDIO_DIR}/{folder_name}/{file}.wav'})
+    with open(st.session_state['output_name'], 'w') as output_f:
+        [output_f.write(f'{json.dumps(dp)}\n') for dp in datapoints]
+                
+st.text_input('ASR json file output name', key='output_name')
+st.text_input('Copy start_index', key='copy_start_i')
+st.text_input('Copy end_index', key='copy_end_i')
+st.button(label='Export corrected for finetuning', on_click=copy_corrected)
 # Why is file name different upon clicking post button

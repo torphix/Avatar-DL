@@ -12,6 +12,7 @@ class ASRFinetune():
         self.output_dir = config['output_dir']
         self.model = SpeechRecognitionModel(config['model_path_or_name'],
                                             self.device)        
+        print(config)
         self.tokens = TokenSet(config['tokens'])
         self.training_args = TrainingArguments(**config['training_args'])
         self.data_path = config['datapath']

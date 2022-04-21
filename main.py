@@ -6,9 +6,10 @@ from tqdm import tqdm
 from natsort import natsorted
 from data.create import create_dataset
 from data.filter import SeperateSpeakers
-from stt.main import asr_finetune, asr_inference, find_oov
 from data.datasets.lex_fridman.lex import get_dataset_length
 from avatar.realistic.train import train as realistic_avatar_train
+from stt.main import asr_finetune, asr_inference, correct_oovs, find_oov
+
 
 def update_config_with_args(config_path, args):
     with open(config_path, 'r') as f:
@@ -88,7 +89,7 @@ if __name__ == '__main__':
                             help='Location where finetuned model is saved to')
         parser.add_argument('-mpn', '--model_path_or_name',
                             help='Disk location of saved model or name of hugging face repo')
-        parser.add_argument('-cp', '--config_path', default='stt/config/inference.yaml',
+        parser.add_argument('-cp', '--config_path', default='stt/config/finetune.yaml',
                             help='Output path, mimics input path structure')
         args, leftover_args = parser.parse_known_args()  
         config_path = args.config_path
@@ -105,6 +106,12 @@ if __name__ == '__main__':
                             help='Path to lexicon, should be in format WORD \t PHONEMES')
         args, leftover_args = parser.parse_known_args()  
         find_oov(args)
+        
+    elif command == 'correct_oov':
+        parser.add_argument('-f', '--oov_file', required=True,
+                            help="Where the OOVs are written to")
+        args, leftover_args = parser.parse_known_args()  
+        correct_oovs(args)
         
     elif command == 'format_audio_text_dirs_for_tts':
         parser.add_argument('-a', '--audio_dir', required=True,

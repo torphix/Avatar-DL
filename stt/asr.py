@@ -1,6 +1,6 @@
 import os
 from tqdm import tqdm 
-from huggingsound import SpeechRecognitionModel
+from huggingsound import SpeechRecognitionModel, KenshoLMDecoder
 
 
 class ASRInference():
@@ -10,7 +10,10 @@ class ASRInference():
         self.output_dir = config['output_dir']
         self.batch_size = config['batch_size']
         # TODO add language model support
-        # TODO add levenshtein auto correct
+        if os.path.isdir(config['lm_dir']):
+            self.lm_decoder = KenshoLMDecoder(self.model.token_set,
+                                              lm_path=f'{config["lm_dir"]}/lm.binary',
+                                              unigrams_path=f'{config["lm_dir"]}/unigrams.txt')
         self.wav_paths = []
         self.inputs = []
         
@@ -39,7 +42,9 @@ class ASRInference():
     def transcribe(self):
         self.get_files(self.input_dir)
         print('Transcribing..')
-        outputs = self.model.transcribe(self.inputs, self.batch_size)
+        outputs = self.model.transcribe(self.inputs, 
+                                        self.batch_size,
+                                        decoder=self.lm_decoder)
         transcriptions = [output['transcription'] for output in outputs]
         self.save_outputs(transcriptions, self.wav_paths)        
     

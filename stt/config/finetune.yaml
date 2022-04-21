@@ -2,7 +2,7 @@ device: 'cuda:0'
 output_dir: stt/models/finetuned/asr.pth
 model_path_or_name: "jonatasgrosman/wav2vec2-large-xlsr-53-english"
 datapath: "stt/data/datasets/processed/dataset.json"
-data_split: [0.95, 0.05]
+data_split: [0.98, 0.02]
 tokens: []
 training_args:
     overwrite_output_dir: True
@@ -28,7 +28,7 @@ training_args:
     fp16: True
     use_8bit_optimizer: False
     logging_steps: 150
-    num_train_epochs: 20
+    num_train_epochs: 45
     max_steps: 0
     report_to: []
     save_total_limit: 
