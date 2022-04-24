@@ -39,8 +39,22 @@ Uses a finetuned transformer as I will never get as good results training from s
 ## Lessons learnt
 1. Bubble up any misclassified elements and fine tune on errors in dataset
 
-## TTS
-1. Finetune mel decoder with generated spectorgrams for better results
+## TTS Training
+1. Setup
+```
+cd tts
+python3 -m venv venv
+source venv/bin/activate
+python3 -r install requirements.txt
+```
+2. Preprocess Files format *.wav *.lab
+```
+python3 main.py preprocess (optional --align=True) otherwise manually place alignments into dataset folder 
+``` 
+3. Finetune 
+```
+python3 main.py train
+```
 
 <!-- Goal Get working pipeline ASAP -->
 1. Use pretrained ASR

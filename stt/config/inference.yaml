@@ -1,6 +1,6 @@
 device: 'cuda:0'
 batch_size: 8
-model_path_or_name: "stt/models/finetuned/lex"
+model_path_or_name: "jonatasgrosman/wav2vec2-large-xlsr-53-english" #"stt/models/finetuned/lex"
 lm_dir: "stt/models/language_models" # Directory should contain lm.binary & unigrams.txt
 input_dir: "data/datasets/lex_fridman/raw/AudioWAV"
 output_dir: "data/datasets/lex_fridman/raw/Text"

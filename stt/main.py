@@ -1,6 +1,10 @@
+import os
+import shutil
+from tqdm import tqdm
+from natsort import natsorted
 from .asr import ASRInference
 from .finetune import ASRFinetune
-from stt.utils import auto_correct_oov, search_for_oov
+from stt.utils import search_for_oov
 
 def asr_inference(config):
     '''
@@ -27,10 +31,8 @@ def find_oov(args):
                    args.output_file,
                    args.lexicon)
     
-def correct_oovs(args):
+def format_data_for_tts(args):
     '''
-    Uses Peter norvigs pyspellchecker to 
-    auto correct transcription 
+    Converts speaker nested folder data to
+    *.wav *.lab file format
     '''
-    auto_correct_oov(args.oov_file)
-    

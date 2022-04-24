@@ -46,7 +46,8 @@ def skip_to_func():
 def delete():
     os.remove(f"{AUDIO_DIR}/{folder_name}/{f_name}.wav")
     os.remove(f"{TEXT_DIR}/{folder_name}/{f_name}.txt")
-
+    del f_names[st.session_state['index']]
+    st.session_state['index'] += 1
 
 text_files = natsorted([file for file in os.listdir(TEXT_DIR)])
 wav_files = natsorted([file for file in os.listdir(AUDIO_DIR)])
@@ -84,17 +85,24 @@ st.text(f'{st.session_state["index"]}/{len(f_names)}')
 def copy_corrected():
     export_files = f_names[int(st.session_state['copy_start_i']): int(st.session_state['copy_end_i'])]
     datapoints = []
-    for file in export_files:
-        folder_name = "_".join(file.split("_")[1:])
-        with open(f'{TEXT_DIR}/{folder_name}/{file}.txt', 'r') as f:
-            text = f.read()
-            datapoints.append(
-                {'transcription':text, 'path':f'{AUDIO_DIR}/{folder_name}/{file}.wav'})
-    with open(st.session_state['output_name'], 'w') as output_f:
-        [output_f.write(f'{json.dumps(dp)}\n') for dp in datapoints]
+    if st.session_state['output_name'] != '':
+        for file in export_files:
+            folder_name = "_".join(file.split("_")[1:])
+            with open(f'{TEXT_DIR}/{folder_name}/{file}.txt', 'r') as f:
+                text = f.read()
+                datapoints.append(
+                    {'transcription':text, 'path':f'{AUDIO_DIR}/{folder_name}/{file}.wav'})
+        with open(st.session_state['output_name'], 'w') as output_f:
+            [output_f.write(f'{json.dumps(dp)}\n') for dp in datapoints]
+    if st.session_state['text_files_copy_loc'] != '':
+        for file in export_files:
+            folder_name = "_".join(file.split("_")[1:])
+            shutil.copy(f'{TEXT_DIR}/{folder_name}/{file}.txt', f'{st.session_state["text_files_copy_loc"]}/{file}.txt')
+    
                 
 st.text_input('ASR json file output name', key='output_name')
+st.text_input('Copy text files output path (optional)', key='text_files_copy_loc')
 st.text_input('Copy start_index', key='copy_start_i')
 st.text_input('Copy end_index', key='copy_end_i')
 st.button(label='Export corrected for finetuning', on_click=copy_corrected)
-# Why is file name different upon clicking post button
+

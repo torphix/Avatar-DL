@@ -1,14 +1,17 @@
 import os
 import sys
 import yaml
+import shutil
 import argparse
+import subprocess
 from tqdm import tqdm
 from natsort import natsorted
 from data.create import create_dataset
 from data.filter import SeperateSpeakers
+from tts.main import preprocess as tts_preprocess
+from stt.main import asr_finetune, asr_inference, find_oov
 from data.datasets.lex_fridman.lex import get_dataset_length
 from avatar.realistic.train import train as realistic_avatar_train
-from stt.main import asr_finetune, asr_inference, correct_oovs, find_oov
 
 
 def update_config_with_args(config_path, args):
@@ -68,7 +71,7 @@ if __name__ == '__main__':
         realistic_avatar_train()
         
     # ASR commands
-    elif command == 'asr_inference':
+    elif command == 'asr_transcribe':
         parser.add_argument('-d', '--device')
         parser.add_argument('-mpn', '--model_path_or_name',
                             help='Disk location of saved model or name of hugging face repo')
@@ -78,10 +81,13 @@ if __name__ == '__main__':
                             help='Output path, mimics input path structure')
         parser.add_argument('-cp', '--config_path', default='stt/config/inference.yaml',
                             help='Output path, mimics input path structure')
+        parser.add_argument('-lm', '--use_lm', default=True,
+                            help='Use language model with transcription, (longer & more accurate)')
         args, leftover_args = parser.parse_known_args()  
-        config_path = args.config_path
+        config_path = args.config_path 
         del args.config_path
         config = update_config_with_args(config_path, args)
+        if args.use_lm == False: del config['lm_dir']
         asr_inference(config)
             
     elif command == 'asr_finetune':
@@ -107,42 +113,51 @@ if __name__ == '__main__':
         args, leftover_args = parser.parse_known_args()  
         find_oov(args)
         
-    elif command == 'correct_oov':
-        parser.add_argument('-f', '--oov_file', required=True,
+    elif command == 'add_oovs_to_lexicon':
+        parser.add_argument('-ovf', '--oov_file', required=True,
                             help="Where the OOVs are written to")
+        parser.add_argument('-lexicon', '--lex_file', required=True,
+                            help="Lexicon file")
         args, leftover_args = parser.parse_known_args()  
         correct_oovs(args)
-        
-    elif command == 'format_audio_text_dirs_for_tts':
-        parser.add_argument('-a', '--audio_dir', required=True,
-                            help='Input dir') 
-        parser.add_argument('-t', '--text_dir', required=True,
-                            help='Output dir will mimic inputs dirs file structure')
-        parser.add_argument('-o', '--output_file', required=True)
-        args, leftover_args = parser.parse_known_args()
-        audio_files = [f'{file}' for file in natsorted(os.listdir(args.audio_dir))]
-        text_files = [f'{args.text_dir}/{file}' for file in natsorted(os.listdir(args.text_dir))]
-        with open(args.output_file, 'w') as output_f:
-            for i in tqdm(range(len(text_files))):
-                text, audio = text_files[i], audio_files[i]
-                with open(text, 'r') as f:
-                    text = f.read().strip("\n")
-                output_f.write(f'{audio.split(".")[0]}|{text}\n')
-                
-    elif command == 'get_dataset_length':
-        parser.add_argument('-i', '--input_dir', required=True,
-                            help='Input dir') 
-        args, leftover_args = parser.parse_known_args()
-        get_dataset_length(args.input_dir)
-        
-    elif command == 'correct_text_files':
-        parser.add_argument('-i', '--input_dir', required=True,
-                            help='Input dir') 
-        parser.add_argument('-av', '--additional_vocab', default='',
-                            help='Extra words to check') 
-        args, leftover_args = parser.parse_known_args()
-        correct_spelling(args.input_dir, args.additional_vocab)
     
+    elif command == 'generate_lexicon':
+        parser.add_argument('-i', '--input_dir', required=True,
+                            help='Path to .wav & .lab files')
+        parser.add_argument('-o', '--output_path', required=True,
+                            help='Path to output lexicon')
+        parser.add_argument('-lm', '--language_model', default='english_g2p')
+        parser.add_argument('-ol', '--update_old_lexicon',
+                            help='Path to old lexicon')
+        args, leftover_args = parser.parse_known_args()
+        print('Aligning Corpus, may take a while please be patient')
+        subprocess.run(f'''
+                       conda run -n aligner mfa g2p {args.language_model} {args.input_dir} {args.output_path}''',
+                        shell=True, capture_output=True, text=True)
+
+        # Clean lexicon
+        with open(args.output_path, 'r') as f:
+            lines = set(f.readlines())
+        with open(args.output_path, 'w') as f:
+            f.writelines(lines)
+        print('Alignment complete please check output file')
+        
+    elif command == 'update_old_lexicon':
+        parser.add_argument('-nl', '--new_lexicon')
+        parser.add_argument('-ol', '--old_lexicon')
+        parser.add_argument('-o', '--output_path')
+        args, leftover_args = parser.parse_known_args()
+        with open(args.old_lexicon, 'r') as f:
+            old_lexicon = set(f.readlines())
+        with open(args.new_lexicon, 'r') as f:
+            new_lexicon = set(f.readlines())
+        lexicon = old_lexicon | new_lexicon
+        with open(args.output_path, 'w') as f:
+            f.writelines(lexicon)
+    
+    # TTS commands
+
+        
     # TTS commands
     # elif command == 'generate_tts_dataset':
     #     parser.add_argument('-cp', '--config_path', required=True,

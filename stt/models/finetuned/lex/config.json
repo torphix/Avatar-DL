@@ -1,5 +1,5 @@
 {
-  "_name_or_path": "/home/j/Desktop/Programming/AI/DeepLearning/la_solitudine/stt/models/finetuned/lex",
+  "_name_or_path": "jonatasgrosman/wav2vec2-large-xlsr-53-english",
   "activation_dropout": 0.1,
   "adapter_kernel_size": 3,
   "adapter_stride": 2,

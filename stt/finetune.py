@@ -1,4 +1,3 @@
-import yaml
 import json
 from huggingsound import (TrainingArguments,
                           SpeechRecognitionModel,
@@ -12,7 +11,6 @@ class ASRFinetune():
         self.output_dir = config['output_dir']
         self.model = SpeechRecognitionModel(config['model_path_or_name'],
                                             self.device)        
-        print(config)
         self.tokens = TokenSet(config['tokens'])
         self.training_args = TrainingArguments(**config['training_args'])
         self.data_path = config['datapath']
@@ -24,7 +22,7 @@ class ASRFinetune():
         data = [json.loads(point.strip('\n')) for point in data]
         train_len = int(len(data)*self.data_split[0])
         eval_len = -int(len(data) - train_len)
-        train_data, eval_data = data[:train_len], data[:eval_len]
+        train_data, eval_data = data[:train_len], data[eval_len:]
         return train_data, eval_data
 
     def finetune(self):

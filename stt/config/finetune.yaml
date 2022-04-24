@@ -1,14 +1,14 @@
 device: 'cuda:0'
-output_dir: stt/models/finetuned/asr.pth
+output_dir: stt/models/finetuned/lex
 model_path_or_name: "jonatasgrosman/wav2vec2-large-xlsr-53-english"
-datapath: "stt/data/datasets/processed/dataset.json"
+datapath: "stt/data/datasets/processed/data.json"
 data_split: [0.98, 0.02]
 tokens: []
 training_args:
     overwrite_output_dir: True
     ignore_pretrained_weights: False
     dataloader_num_workers: 2
-    learning_rate: 3.0e-4
+    learning_rate: 2.0e-4
     min_learning_rate: 0.0
     weight_decay: 0.0
     adam_beta1: 0.9
@@ -20,7 +20,7 @@ training_args:
     eval_steps: 
     group_by_length: True
     length_column_name: "length"
-    gradient_accumulation_steps: 1
+    gradient_accumulation_steps: 3
     gradient_checkpointing: True
     pad_to_multiple_of: 
     per_device_train_batch_size: 8
@@ -35,7 +35,7 @@ training_args:
     metric_for_best_model: 
     _n_gpu: 1
     seed: 42
-    training_step_callbacks: []
+    training_step_callbacks: [] 
     batch_creation_callbacks: []
     evaluation_callbacks: []
     metrics_batch_size: 
