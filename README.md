@@ -78,7 +78,6 @@ python3 main.py train
 
 <!-- Add Tensorboard to SDA -->
 
-Once done email gdb@openai.com 
 
 
 <!-- Code maintenance hygine etc -->
